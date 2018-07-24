@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, HttpCode, Body } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, HttpCode, Body, ValidationPipe, UsePipes } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from './interfaces/product.interface';
@@ -18,6 +18,7 @@ export class ProductsController {
     }
 
     @Post()
+    @UsePipes(new ValidationPipe({ transform: true }))
     create(@Body() createProductDto: CreateProductDto): Promise<Product> {
         return this.productsService.create(createProductDto);
     }
