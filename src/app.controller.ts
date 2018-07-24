@@ -9,8 +9,5 @@ export class AppController {
   root(): string {
     return this.appService.root();
   }
-  @Get('user/:id/debt')
-  async findOne(@Param('id') id){
-    return await `Showing debt from user #${id}`;
-  }
+
 }
