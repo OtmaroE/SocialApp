@@ -14,7 +14,7 @@ export class ProductsController {
 
     @Get(':id')
     findOne(@Param('id') id: string) {
-
+        return this.findOne(id);
     }
 
     @Post()
@@ -25,6 +25,6 @@ export class ProductsController {
     @Delete(':id')
     @HttpCode(204)
     deleteById(@Param('id') id: string) {
-
+        this.productsService.deleteById(id);
     }
 }
