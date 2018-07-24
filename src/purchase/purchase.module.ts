@@ -5,7 +5,7 @@ import { PurchaseService } from './purchase.service';
 import { PurchaseSchema } from './Schemas/purchase.schema';
 
 @Module({
-    imports: [MongooseModule.forFeature([{name: 'purchase', schema: PurchaseSchema}])],
+    imports: [MongooseModule.forFeature([{name: 'Purchase', schema: PurchaseSchema}])],
     controllers: [PurchaseController],
     providers: [PurchaseService],
 })
