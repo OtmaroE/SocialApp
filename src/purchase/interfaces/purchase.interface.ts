@@ -1,6 +1,4 @@
-import { Document } from 'mongoose';
-
-export interface Purchase extends Document {
+export interface Purchase {
     readonly userId: String;
     readonly productId: String;
     readonly created: Date;

@@ -5,4 +5,4 @@ export const PurchaseSchema = new mongoose.Schema({
     productId: String,
     created: Date,
     modified: Date
-})
+});
