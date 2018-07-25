@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, BadRequestException, UseGuards, Req } from '@nestjs/common';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { PurchaseService } from './purchase.service';
 import { Purchase } from './interfaces/purchase.interface';
@@ -21,11 +21,12 @@ export class PurchaseController {
     async create(@Body() createPurchaseDto: CreatePurchaseDto, @Req() request){
         const productId = String(createPurchaseDto.productId);
         // validate objectId
-        const ProductExistance = await this.productsService.findOne(productId);
-        if(ProductExistance){
-            return this.purchaseService.create(createPurchaseDto, request.user.id, ProductExistance);
+        const productExistance = await this.productsService.findOne(productId);
+        if(!productExistance){
+             throw new BadRequestException();
         }
-        return {status: 409, message: 'Not a valid Product'};
+        const newPurchase = new CreatePurchaseDto(request.user.id, productId);
+        return this.purchaseService.create(newPurchase);
     }
 
     @Get('/details')

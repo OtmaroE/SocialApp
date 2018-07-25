@@ -3,15 +3,27 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Purchase } from './interfaces/purchase.interface';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
-import { Product } from 'products/interfaces/product.interface';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class PurchaseService {
-    constructor( @InjectModel('Purchase') private readonly PurchaseModel: Model<Purchase> ) {}
+    constructor( 
+        @InjectModel('Purchase') private readonly PurchaseModel: Model<Purchase>,
+        private readonly productsService: ProductsService,
+    ) {}
 
-    async create(createPurchaseDto: CreatePurchaseDto, userId, product: Product): Promise<Purchase> {
-        const purchaseObject = new CreatePurchaseDto(userId, String(createPurchaseDto.productId), product.name, product.price);
-        const createdPurchase = new this.PurchaseModel(purchaseObject);
+    async create(createPurchaseDto: CreatePurchaseDto): Promise<Purchase> {
+        const productId = String(createPurchaseDto.productId)
+        const productInfo = await this.productsService.findOne(productId);
+        const newPurchase = {
+            userId: createPurchaseDto.userId,
+            productId: createPurchaseDto.productId,
+            productName: createPurchaseDto.productName,
+            pricePaid: productInfo.price,
+            created: createPurchaseDto.created,
+            modified: createPurchaseDto.modified
+        }
+        const createdPurchase = new this.PurchaseModel(newPurchase);
         return await createdPurchase.save();
     }
 
