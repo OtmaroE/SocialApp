@@ -1,8 +1,10 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, UseGuards, Put, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, UseGuards, Put, BadRequestException, Req, Patch, Param } from '@nestjs/common';
 import { UsersDto } from './dto/users.dto';
 import { UserService } from './users.service';
-import { RoleGuard } from '../authentication/auth.guard';
-import { Roles } from '../authentication/auth.decorator';
+import { RoleGuard } from 'authentication/auth.guard';
+import { Roles } from 'authentication/auth.decorator';
+import { ValidateLimit } from './pipes/limit-validate.pipe';
+import { ValidateMongoId } from 'pipes/validate-mongoId.pipe';
 
 @Controller('users')
 @UseGuards(RoleGuard)
@@ -29,8 +31,13 @@ export class UsersController {
 
   @Put()
   @Roles('admin')
-  updateGlobalDebtLimit(@Body('limit') limit) {
-    if (!limit || Number.isNaN(limit) || limit <= 0) throw new BadRequestException('Invalid new limit');
+  updateGlobalDebtLimit(@Body('limit', new ValidateLimit()) limit) {
     return this.userService.updateCreditLimit(limit);
+  }
+
+  @Patch(':id')
+  @Roles('admin')
+  updateCreditLimit(@Param('id', new ValidateMongoId()) user, @Body('limit', new ValidateLimit()) limit) {
+    return this.userService.updateOneUserCreditLimit(user, limit);
   }
 }
