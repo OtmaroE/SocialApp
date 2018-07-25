@@ -1,6 +1,6 @@
 export interface Purchase {
-    readonly userId: String;
-    readonly productId: String;
+    readonly userId: string;
+    readonly productId: string;
     readonly created: Date;
     readonly modified: Date;
 }
