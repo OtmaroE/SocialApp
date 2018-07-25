@@ -7,24 +7,23 @@ import { Roles } from '../authentication/auth.decorator';
 @Controller('users')
 @UseGuards(RoleGuard)
 export class UsersController {
-  constructor(private readonly userService: UserService) {}
+    constructor(private readonly userService: UserService) { }
 
-  @Post('login')
-  @UsePipes(new ValidationPipe())
-  @HttpCode(200)
-  login(@Body() usersDto: UsersDto) {
-    return this.userService.login(usersDto);
-  }
+    @Post('login')
+    @UsePipes(new ValidationPipe())
+    @HttpCode(200)
+    login(@Body() usersDto: UsersDto) {
+        return this.userService.login(usersDto);
+    }
 
-  @Post('logout')
-  logout() {
-    return;
-  }
+    @Post('logout')
+    logout() {
+        return;
+    }
 
-  @Post()
-  @Roles('admin')
-  @UsePipes(new ValidationPipe())
-  create(@Body() usersDto: UsersDto) {
-    return this.userService.signup(usersDto);
-  }
+    @Post()
+    @UsePipes(new ValidationPipe())
+    create(@Body() usersDto: UsersDto) {
+        return this.userService.signup(usersDto);
+    }
 }
