@@ -17,4 +17,10 @@ export class UserService {
   async signup(user: UsersDto): Promise<User> {
     return await this.userModel.create({ username: user.username, password: this.userModel.hashPassword(user.password)});
   }
+  async updateCreditLimit(creditLimit: number) {
+    return await this.userModel.update({}, { $set: { creditLimit }}).exec();
+  }
+  async updateOneUserCreditLimit(_id: string, creditLimit: number) {
+    return await this.userModel.update({ _id }, { $set: { creditLimit }}, { new: true }).exec();
+  }
 }
