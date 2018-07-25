@@ -1,15 +1,12 @@
-export class CreateProductDto {
-    readonly name: string;
-    readonly price: number;
-    readonly brand: string;
-    readonly created: Date;
-    readonly modified: Date;
+import { IsString, IsNumber } from 'class-validator';
 
-    constructor(name: string, price: number, brand: string) {
-        this.name = name;
-        this.price = price;
-        this.brand = brand;
-        this.created = new Date();
-        this.modified = new Date();
-    }
+export class CreateProductDto {
+    @IsString()
+    readonly name: string;
+
+    @IsNumber()
+    readonly price: number;
+
+    @IsString()
+    readonly brand: string;
 }
