@@ -8,12 +8,17 @@ import { CreatePurchaseDto } from './dto/create-purchase.dto';
 export class PurchaseService {
     constructor(@InjectModel('Purchase') private readonly PurchaseModel: Model<Purchase>) {}
 
-    async create(createPurchaseDto: CreatePurchaseDto): Promise<Purchase> {
-        const createdPurchase = new this.PurchaseModel(createPurchaseDto);
-        return await createdPurchase.save();
+    async create(createPurchaseDto: CreatePurchaseDto, request): Promise<Purchase> {
+        const purchaseObject = {
+            userId: request.user.id, 
+            productId: createPurchaseDto.productId
+        }
+        const createdPurchase = new this.PurchaseModel();
+        return await createdPurchase.save(purchaseObject);
     }
 
-    async findAll(): Promise<Purchase[]> {
-        return await this.PurchaseModel.find().exec();
+    async findAll(user): Promise<Purchase[]> {
+        console.log("Need id: ", user.id);
+        return await this.PurchaseModel.find({userId: user.id}).exec();
     }
 }

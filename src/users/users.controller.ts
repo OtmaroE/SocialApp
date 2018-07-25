@@ -13,6 +13,7 @@ export class UsersController {
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   login(@Body() usersDto: UsersDto) {
+    console.log(usersDto);
     return this.userService.login(usersDto);
   }
 
@@ -22,7 +23,7 @@ export class UsersController {
   }
 
   @Post()
-  @Roles('admin')
+  // @Roles('admin')
   @UsePipes(new ValidationPipe())
   create(@Body() usersDto: UsersDto) {
     return this.userService.signup(usersDto);
