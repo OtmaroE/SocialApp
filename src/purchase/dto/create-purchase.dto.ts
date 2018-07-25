@@ -5,6 +5,7 @@ export class CreatePurchaseDto {
     readonly modified: Date;
 
     constructor(userId: string, productId: string) {
+        console.log("User: ", userId, " Product: ", productId);
         this.userId = userId;
         this.productId = productId;
         this.created = new Date();

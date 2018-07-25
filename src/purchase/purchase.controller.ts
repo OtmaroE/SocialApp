@@ -4,17 +4,26 @@ import { PurchaseService } from './purchase.service';
 import { Purchase } from './interfaces/purchase.interface';
 import { RoleGuard } from '../authentication/auth.guard';
 import { Roles } from '../authentication/auth.decorator';
-import { request } from 'https';
+import { ProductsService } from '../products/products.service';
 
 @Controller('purchase')
 @UseGuards(RoleGuard)
 export class PurchaseController {
-    constructor(private readonly purchaseService: PurchaseService) {}
+    constructor(
+        private readonly purchaseService: PurchaseService,
+        private readonly productsService: ProductsService
+    ) {}
 
     @Post()
     @Roles('admin')
-    create(@Body() createPurchaseDto: CreatePurchaseDto, @Req() request){
-        return this.purchaseService.create(createPurchaseDto, request);
+    async create(@Body() createPurchaseDto: CreatePurchaseDto, @Req() request){
+        const productId = String(createPurchaseDto.productId);
+        // validate objectId
+        const ProductExistance = await this.productsService.findOne(productId);
+        if(ProductExistance){
+            return this.purchaseService.create(createPurchaseDto, request.user.id);
+        }
+        return {status: 409, message: 'Not a valid Product'};
     }
 
     @Get()
