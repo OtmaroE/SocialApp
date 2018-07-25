@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken';
-import { UnauthorizedException } from '../../../node_modules/@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 const { SECRET } = process.env;
 
 export const createJWT = (user) => {
