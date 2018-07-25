@@ -1,8 +1,11 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, UseGuards } from '@nestjs/common';
 import { UsersDto } from './dto/users.dto';
 import { UserService } from './users.service';
+import { RoleGuard } from '../authentication/auth.guard';
+import { Roles } from '../authentication/auth.decorator';
 
 @Controller('users')
+@UseGuards(RoleGuard)
 export class UsersController {
   constructor(private readonly userService: UserService) {}
 
@@ -19,6 +22,7 @@ export class UsersController {
   }
 
   @Post()
+  @Roles('admin')
   @UsePipes(new ValidationPipe())
   create(@Body() usersDto: UsersDto) {
     return this.userService.signup(usersDto);

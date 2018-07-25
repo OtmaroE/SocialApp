@@ -11,7 +11,7 @@ export class UserService {
   login(user: UsersDto): Promise<User> {
     return this.userModel.findOne({ username: user.username }).exec().then((userFound) => {
       if (!userFound || !userFound.comparePass(user.password)) throw new UnauthorizedException('Invalid credentials');
-      return { token: createJWT(user) };
+      return { token: createJWT(userFound) };
     });
   }
   async signup(user: UsersDto): Promise<User> {
