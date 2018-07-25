@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Delete, Param, HttpCode, Body, ValidationPipe, UsePipes, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, HttpCode, Body, ValidationPipe, UsePipes, BadRequestException } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
+import { PatchProductDto } from './dto/patch-product.dto';
 import { Product } from './interfaces/product.interface';
 import { Validator } from 'class-validator';
 const validator = new Validator();
@@ -24,6 +25,13 @@ export class ProductsController {
     @UsePipes(new ValidationPipe({ transform: true }))
     create(@Body() createProductDto: CreateProductDto): Promise<Product> {
         return this.productsService.create(createProductDto);
+    }
+
+    @Patch(':id')
+    @UsePipes(new ValidationPipe({ transform: true }))
+    updateAttribute(@Body() patchProductDto: PatchProductDto, @Param('id') id: string): Promise<Product> {
+        if (!validator.isMongoId(id)) throw new BadRequestException();
+        return this.productsService.updateAttribute(patchProductDto, id);
     }
 
     @Delete(':id')
