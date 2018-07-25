@@ -5,6 +5,13 @@ export const PurchaseSchema = new mongoose.Schema({
     productId: String,
     productName: String,
     pricePaid: Number,
-    created: Date,
-    modified: Date
+    created: { 
+        type: Date, 
+        default: Date.now 
+    },
+    modified: Date,
+});
+PurchaseSchema.pre('save', function(next) {
+    this.modified = new Date();
+    next();
 });

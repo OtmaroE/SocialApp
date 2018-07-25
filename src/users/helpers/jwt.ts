@@ -1,4 +1,5 @@
 import * as jwt from 'jsonwebtoken';
+import { UnauthorizedException } from '@nestjs/common';
 const { SECRET } = process.env;
 
 export const createJWT = (user) => {
@@ -6,5 +7,12 @@ export const createJWT = (user) => {
 };
 
 export const validateJWT = (token) => {
-  return jwt.verify(token, SECRET);
+  let decoded = {};
+  try {
+    decoded = jwt.verify(token, SECRET);
+  } catch (e) {
+    if (e.name === 'JsonWebTokenError') throw new UnauthorizedException(e.message);
+    if (e.name === 'TokenExpiredError') throw new UnauthorizedException('Token has expired');
+  }
+  return decoded;
 };

@@ -37,5 +37,4 @@ export class PurchaseController {
     async findAll(@Req() request): Promise<Purchase[]> {
         return this.purchaseService.findAll(request.user);
     }
-
 }
