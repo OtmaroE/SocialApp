@@ -5,13 +5,15 @@ import { Purchase } from './interfaces/purchase.interface';
 import { RoleGuard } from '../authentication/auth.guard';
 import { Roles } from '../authentication/auth.decorator';
 import { ProductsService } from '../products/products.service';
+import { UserService} from '../users/users.service';
 
 @Controller('purchase')
 @UseGuards(RoleGuard)
 export class PurchaseController {
     constructor(
         private readonly purchaseService: PurchaseService,
-        private readonly productsService: ProductsService
+        private readonly productsService: ProductsService,
+        private readonly userService: UserService
     ) {}
 
     @Post()
