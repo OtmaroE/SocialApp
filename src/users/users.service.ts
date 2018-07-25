@@ -14,6 +14,10 @@ export class UserService {
       return { token: createJWT(userFound) };
     });
   }
+  async findById(_id: string): Promise<User> {
+    return await this.userModel.findOne({ _id }).project({ username: '$username', limit: '$creditLimit'}).exec();
+  }
+
   async signup(user: UsersDto): Promise<User> {
     return await this.userModel.create({ username: user.username, password: this.userModel.hashPassword(user.password)});
   }
