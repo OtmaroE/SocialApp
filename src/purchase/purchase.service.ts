@@ -18,6 +18,8 @@ export class PurchaseService {
 
     async findAll(user): Promise<Purchase[]> {
         console.log("Need id: ", user.id);
-        return await this.PurchaseModel.find({userId: user.id}).exec();
+        const ProductList = await this.PurchaseModel.find({userId: user.id}).exec();
+        console.log(ProductList);
+        return ProductList;
     }
 }
