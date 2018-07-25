@@ -21,9 +21,15 @@ export class PurchaseController {
         // validate objectId
         const ProductExistance = await this.productsService.findOne(productId);
         if(ProductExistance){
-            return this.purchaseService.create(createPurchaseDto, request.user.id);
+            return this.purchaseService.create(createPurchaseDto, request.user.id, ProductExistance);
         }
         return {status: 409, message: 'Not a valid Product'};
+    }
+
+    @Get('/details')
+    @Roles('admin')
+    async findAllDetails(@Req() request): Promise<Purchase[]> {
+        return this.purchaseService.findAllDetails(request.user);
     }
 
     @Get()
