@@ -40,4 +40,3 @@ export class UsersController {
       return this.userService.updateOneUserCreditLimit(user, limit);
     }
 }
-
