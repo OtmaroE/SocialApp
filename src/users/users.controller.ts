@@ -9,35 +9,35 @@ import { ValidateMongoId } from 'pipes/validate-mongoId.pipe';
 @Controller('users')
 @UseGuards(RoleGuard)
 export class UsersController {
-  constructor(private readonly userService: UserService) {}
+    constructor(private readonly userService: UserService) { }
 
-  @Post('login')
-  @UsePipes(new ValidationPipe())
-  @HttpCode(200)
-  login(@Body() usersDto: UsersDto) {
-    return this.userService.login(usersDto);
-  }
+    @Post('login')
+    @UsePipes(new ValidationPipe())
+    @HttpCode(200)
+    login(@Body() usersDto: UsersDto) {
+        return this.userService.login(usersDto);
+    }
 
-  @Post('logout')
-  logout() {
-    return;
-  }
+    @Post('logout')
+    logout() {
+        return;
+    }
+    @Post()
+    @UsePipes(new ValidationPipe())
+    create(@Body() usersDto: UsersDto) {
+      return this.userService.signup(usersDto);
+    }
 
-  @Post()
-  @UsePipes(new ValidationPipe())
-  create(@Body() usersDto: UsersDto) {
-    return this.userService.signup(usersDto);
-  }
+    @Put()
+    @Roles('admin')
+    updateGlobalDebtLimit(@Body('limit', new ValidateLimit()) limit) {
+      return this.userService.updateCreditLimit(limit);
+    }
 
-  @Put()
-  @Roles('admin')
-  updateGlobalDebtLimit(@Body('limit', new ValidateLimit()) limit) {
-    return this.userService.updateCreditLimit(limit);
-  }
-
-  @Patch(':id')
-  @Roles('admin')
-  updateCreditLimit(@Param('id', new ValidateMongoId()) user, @Body('limit', new ValidateLimit()) limit) {
-    return this.userService.updateOneUserCreditLimit(user, limit);
-  }
+    @Patch(':id')
+    @Roles('admin')
+    updateCreditLimit(@Param('id', new ValidateMongoId()) user, @Body('limit', new ValidateLimit()) limit) {
+      return this.userService.updateOneUserCreditLimit(user, limit);
+    }
 }
+
