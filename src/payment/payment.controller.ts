@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req, HttpException, HttpStatus } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/payment.dto';
 import { PaymentService } from './payment.service';
 import { Payment } from './interfaces/payment.interface';
@@ -14,12 +14,26 @@ export class PaymentController {
     ) {}
 
     @Get()
-    findAll(){
-        return 'Shows all the money you have paid';
+    @Roles('admin')
+    findAll(@Req() request){
+       return this.paymentService.findAll(request.user.id);
     }
 
+    @Get('details')
+    @Roles('admin')
+    async findAllDetails(@Req() request) {
+        return this.paymentService.findAllDetails(request.user.id);
+    }
+    
     @Post()
-    create(){
-        return 'Add a payment to the pull and reduces your debt';
+    @Roles('admin')
+    async create(@Body() jsonBody, @Req() request){
+        const userId = request.user.id;
+        const amountPaid = jsonBody.pay;
+        if(!amountPaid){
+            throw new HttpException('Bad pay value', HttpStatus.BAD_REQUEST);
+        }
+        const createPaymentDto = new CreatePaymentDto(userId, amountPaid);
+        return await this.paymentService.pay(createPaymentDto);
     }
 }
