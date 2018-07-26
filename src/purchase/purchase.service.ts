@@ -44,7 +44,7 @@ export class PurchaseService {
         .exec();
     }
 
-    async getUserTotalDebt(userId: string): Promise<Number> {
+    async getUserTotalDebt(userId: string): Promise<number> {
         const totalOwedReport = await this.PurchaseModel
         .aggregate()
         .match({ userId })
