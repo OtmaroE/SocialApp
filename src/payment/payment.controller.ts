@@ -6,7 +6,7 @@ import { RoleGuard } from '../authentication/auth.guard';
 import { Roles } from '../authentication/auth.decorator';
 import { create } from 'domain';
 
-@Controller('payment')
+@Controller('payments')
 @UseGuards(RoleGuard)
 export class PaymentController {
     constructor(
