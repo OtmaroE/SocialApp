@@ -16,7 +16,7 @@ export class PaymentService {
         return await this.PaymentModel
         .aggregate()
         .match({ userId })
-        .group({ _id: '$userId', totalPaid: { $sum: '$amountPayed'}})
+        .group({ _id: '$userId', totalPaid: { $sum: '$amountPaid'}})
         .project({ _id: 0, Userid: '$_id', totalPaid: '$totalPaid'})
         .exec()
     }
@@ -30,6 +30,9 @@ export class PaymentService {
 
     async getUserTotalPaid(userId): Promise<number> {
         const TotalPaymentReport = await this.findAll(userId);
+        if(!TotalPaymentReport[0]){
+            return 0;
+        }
         return TotalPaymentReport[0].totalPaid | 0;
     }
     

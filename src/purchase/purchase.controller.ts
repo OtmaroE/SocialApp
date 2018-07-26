@@ -46,7 +46,7 @@ export class PurchaseController {
         return this.purchaseService.findAllDetails(request.user.id);
     }
 
-    @Get('/debt')
+    @Get('debt')
     @Roles('admin')
     async getUserTotalDebt(@Req() request): Promise<Object> {
         const userTotalDebt = await this.purchaseService.getUserTotalDebt(request.user.id);
