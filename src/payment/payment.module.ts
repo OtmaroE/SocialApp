@@ -11,7 +11,8 @@ import { PurchaseModule } from 'purchase/purchase.module';
         forwardRef(() => PurchaseModule)
     ],
     controllers: [PaymentController],
-    providers: [PaymentService]
+    providers: [PaymentService],
+    exports: [PaymentService]
 })
 
 export class PaymentModule { }
