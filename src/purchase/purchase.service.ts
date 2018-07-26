@@ -27,7 +27,7 @@ export class PurchaseService {
         return await createdPurchase.save();
     }
 
-    async findAllDetails(userId): Promise<Purchase[]> {
+    async findAllDetails(userId: string): Promise<Purchase[]> {
         return await this.PurchaseModel
         .aggregate()
         .match({ userId })
@@ -36,11 +36,20 @@ export class PurchaseService {
         .exec();
     }
 
-    async findAll(userId): Promise<Purchase[]> {
+    async findAll(userId: string): Promise<Purchase[]> {
         return await this.PurchaseModel
         .aggregate()
         .match({ userId })
         .group({ _id: '$userId', totalOwed: { $sum: '$pricePaid' } })
         .exec();
+    }
+
+    async getUserTotalDebt(userId: string): Promise<Number> {
+        const totalOwedReport = await this.PurchaseModel
+        .aggregate()
+        .match({ userId })
+        .group({ _id: '$userId', totalOwed: { $sum: '$pricePaid'}})
+        .exec();
+        return totalOwedReport[0].totalOwed;
     }
 }

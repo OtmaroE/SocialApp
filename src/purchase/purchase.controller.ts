@@ -24,13 +24,14 @@ export class PurchaseController {
             throw new HttpException('Bad Prodict Id', HttpStatus.BAD_REQUEST);
         }
         const productExistance = await this.productsService.findOne(productId);
-        const userInfo = await this.userService.findById(request.user.id);
-        const userPurchase = await this.purchaseService.findAll(request.user);
-        console.log('userInfo:\n', userInfo, '\nuserPurchase\n', userPurchase);
         if(!productExistance){
              throw new BadRequestException();
         }
-        if(userInfo.creditLimit <=  userPurchase[0].totalOwed){
+        const userInfo = await this.userService.findById(request.user.id);
+        const userTotalDebt = await this.purchaseService.getUserTotalDebt(request.user.id);
+        console.log('User\'s Credit: ', userInfo.creditLimit);
+        console.log('Actual debt: ', userTotalDebt);
+        if(userInfo.creditLimit <=  userTotalDebt){
            throw new HttpException('Already reach purchase Limit', HttpStatus.CONFLICT);
         }
         const newPurchase = new CreatePurchaseDto(request.user.id, productId);
