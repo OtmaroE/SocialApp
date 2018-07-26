@@ -1,12 +1,12 @@
 export class CreatePaymentDto {
     readonly userId: String;
-    readonly amountPayed: Number;
+    readonly amountPaid: Number;
     readonly created: Date;
     readonly modified: Date;
 
-    constructor(userId: string, amountPayed: number) {
+    constructor(userId: string, amountPaid: number) {
         this.userId = userId;
-        this.amountPayed = amountPayed;
+        this.amountPaid = amountPaid;
         this.created = new Date();
         this.modified = new Date();
     }
