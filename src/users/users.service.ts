@@ -5,6 +5,7 @@ import { User } from './interface/users.interface';
 import { UserInfo } from './interface/user-info.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { createJWT } from './helpers/jwt';
+import client from './helpers/redis';
 
 @Injectable()
 export class UserService {
@@ -36,5 +37,10 @@ export class UserService {
     const result = await this.userModel.update({ _id }, { $set: { creditLimit }}, { new: true }).exec();
     if (result.ok === 1) return { message: `Updated credit limit for this user`};
     else return null;
+  }
+  async logout(uuid: string): Promise<boolean> {
+    return client.del(uuid, (err, response) => {
+      return response === 1;
+    });
   }
 }

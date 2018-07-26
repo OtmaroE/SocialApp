@@ -1,9 +1,15 @@
 import * as jwt from 'jsonwebtoken';
+import * as uuid from 'uuid/v1';
+import client from './redis';
+
 import { UnauthorizedException } from '@nestjs/common';
 const { SECRET } = process.env;
 
 export const createJWT = (user) => {
-  return jwt.sign({ id: user._id, username: user.username, role: user.role }, SECRET, { expiresIn: '12h'});
+  const tokenUUID = uuid();
+  const token = jwt.sign({ id: user._id, username: user.username, role: user.role, uuid: tokenUUID }, SECRET, { expiresIn: '12h'});
+  client.set(`${tokenUUID}`, 'token', 'EX', '43200');
+  return token;
 };
 
 export const validateJWT = (token) => {
