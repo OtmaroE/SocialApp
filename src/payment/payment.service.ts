@@ -24,13 +24,13 @@ export class PaymentService {
         return await this.PaymentModel.find({ userId });
     }
     async pay(createPaymentDto: CreatePaymentDto): Promise<Payment> {
-        console.log('Userid: ', createPaymentDto.userId);
-        // add payment to the payment table
         let payment = await this.PaymentModel.create(createPaymentDto);
-        // Query all the money they have paid
-        // Quey al the money the owe
-        // Return a successfull payment + amount left to pay
         return payment;
+    }
+
+    async getUserTotalPaid(userId): Promise<number> {
+        const TotalPaymentReport = await this.findAll(userId);
+        return TotalPaymentReport[0].totalPaid | 0;
     }
     
 }

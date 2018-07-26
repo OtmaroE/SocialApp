@@ -6,10 +6,11 @@ export class CreatePurchaseDto {
     readonly created: Date;
     readonly modified: Date;
 
-    constructor(userId: string, productId: string) {
+    constructor(userId: string, productId: string, productName: string = 'Not yet Defined', pricePaid: number = 12) {
         this.userId = userId;
-        this.pricePaid = 12;
+        this.pricePaid = pricePaid;
         this.productId = productId;
+        this.productName = productName;
         this.created = new Date();
         this.modified = new Date();
     }

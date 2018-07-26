@@ -6,14 +6,16 @@ import { RoleGuard } from '../authentication/auth.guard';
 import { Roles } from '../authentication/auth.decorator';
 import { ProductsService } from '../products/products.service';
 import { UserService} from '../users/users.service';
+import { PaymentService } from 'payment/payment.service';
 
-@Controller('purchase')
+@Controller('purchases')
 @UseGuards(RoleGuard)
 export class PurchaseController {
     constructor(
         private readonly purchaseService: PurchaseService,
         private readonly productsService: ProductsService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly paymentService: PaymentService
     ) {}
 
     @Post()
@@ -24,28 +26,35 @@ export class PurchaseController {
             throw new HttpException('Bad Prodict Id', HttpStatus.BAD_REQUEST);
         }
         const productExistance = await this.productsService.findOne(productId);
-        const userInfo = await this.userService.findById(request.user.id);
-        const userPurchase = await this.purchaseService.findAll(request.user);
-        console.log('userInfo:\n', userInfo, '\nuserPurchase\n', userPurchase);
         if(!productExistance){
              throw new BadRequestException();
         }
-        if(userInfo.creditLimit <=  userPurchase[0].totalOwed){
+        const userInfo = await this.userService.findById(request.user.id);
+        const userTotalDebt = await this.purchaseService.getUserTotalDebt(request.user.id);
+        const userTotalPayed = await this.paymentService.getUserTotalPaid(request.user.id);
+        const userUsedCredit = userTotalDebt - userTotalPayed;
+        if(userInfo.creditLimit <=  userUsedCredit){
            throw new HttpException('Already reach purchase Limit', HttpStatus.CONFLICT);
         }
         const newPurchase = new CreatePurchaseDto(request.user.id, productId);
         return this.purchaseService.create(newPurchase);
     }
 
-    @Get('/details')
+    @Get()
     @Roles('admin')
     async findAllDetails(@Req() request): Promise<Purchase[]> {
         return this.purchaseService.findAllDetails(request.user.id);
     }
 
-    @Get()
+    @Get('/debt')
     @Roles('admin')
-    async findAll(@Req() request): Promise<Purchase[]> {
-        return this.purchaseService.findAll(request.user.id);
+    async getUserTotalDebt(@Req() request): Promise<Object> {
+        const userTotalDebt = await this.purchaseService.getUserTotalDebt(request.user.id);
+        const userTotalPayed = await this.paymentService.getUserTotalPaid(request.user.id);
+        const userUsedCredit = userTotalDebt - userTotalPayed;
+        return  {
+            userId: request.user.id,
+            debt: userUsedCredit
+        }
     }
 }
