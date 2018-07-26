@@ -27,19 +27,19 @@ export class PurchaseService {
         return await createdPurchase.save();
     }
 
-    async findAllDetails(user): Promise<Purchase[]> {
+    async findAllDetails(userId): Promise<Purchase[]> {
         return await this.PurchaseModel
         .aggregate()
-        .match({ userId: user.id })
+        .match({ userId })
         .group({ _id: '$productName', pricePaid: { $sum: 1 }, total: { $sum: '$pricePaid' }, created: { $max: '$created' } })
         .project({ _id: 0, Product: '$_id', lasPurchase: '$created', items: '$pricePaid', total: '$total' })
         .exec();
     }
 
-    async findAll(user): Promise<Purchase[]> {
+    async findAll(userId): Promise<Purchase[]> {
         return await this.PurchaseModel
         .aggregate()
-        .match({ userId: user.id })
+        .match({ userId })
         .group({ _id: '$userId', totalOwed: { $sum: '$pricePaid' } })
         .exec();
     }

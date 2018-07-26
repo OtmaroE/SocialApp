@@ -40,12 +40,12 @@ export class PurchaseController {
     @Get('/details')
     @Roles('admin')
     async findAllDetails(@Req() request): Promise<Purchase[]> {
-        return this.purchaseService.findAllDetails(request.user);
+        return this.purchaseService.findAllDetails(request.user.id);
     }
 
     @Get()
     @Roles('admin')
     async findAll(@Req() request): Promise<Purchase[]> {
-        return this.purchaseService.findAll(request.user);
+        return this.purchaseService.findAll(request.user.id);
     }
 }
