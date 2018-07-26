@@ -6,10 +6,11 @@ import { ProductsModule } from 'products/products.module';
 import { PurchaseModule } from 'purchase/purchase.module';
 import { UsersModule } from 'users/users.module';
 import { attachUserToReq } from 'middleware/user.middleware';
+import { PaymentModule } from 'payment/payment.module';
 const { MONGO_URI } = process.env;
 
 @Module({
-    imports: [MongooseModule.forRoot(MONGO_URI), ProductsModule, PurchaseModule, UsersModule],
+    imports: [MongooseModule.forRoot(MONGO_URI), ProductsModule, PurchaseModule, UsersModule, PaymentModule],
     controllers: [AppController],
     providers: [AppService],
 })
