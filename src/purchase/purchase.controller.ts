@@ -8,7 +8,7 @@ import { ProductsService } from '../products/products.service';
 import { UserService} from '../users/users.service';
 import { PaymentService } from 'payment/payment.service';
 
-@Controller('purchase')
+@Controller('purchases')
 @UseGuards(RoleGuard)
 export class PurchaseController {
     constructor(
@@ -40,15 +40,21 @@ export class PurchaseController {
         return this.purchaseService.create(newPurchase);
     }
 
-    @Get('/details')
+    @Get()
     @Roles('admin')
     async findAllDetails(@Req() request): Promise<Purchase[]> {
         return this.purchaseService.findAllDetails(request.user.id);
     }
 
-    @Get()
+    @Get('/debt')
     @Roles('admin')
-    async findAll(@Req() request): Promise<Purchase[]> {
-        return this.purchaseService.findAll(request.user.id);
+    async getUserTotalDebt(@Req() request): Promise<Object> {
+        const userTotalDebt = await this.purchaseService.getUserTotalDebt(request.user.id);
+        const userTotalPayed = await this.paymentService.getUserTotalPaid(request.user.id);
+        const userUsedCredit = userTotalDebt - userTotalPayed;
+        return  {
+            userId: request.user.id,
+            debt: userUsedCredit
+        }
     }
 }
