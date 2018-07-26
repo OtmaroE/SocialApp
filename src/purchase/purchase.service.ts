@@ -15,15 +15,9 @@ export class PurchaseService {
     async create(createPurchaseDto: CreatePurchaseDto): Promise<Purchase> {
         const productId = String(createPurchaseDto.productId)
         const productInfo = await this.productsService.findOne(productId);
-        const newPurchase = {
-            userId: createPurchaseDto.userId,
-            productId: createPurchaseDto.productId,
-            productName: createPurchaseDto.productName,
-            pricePaid: productInfo.price,
-            created: createPurchaseDto.created,
-            modified: createPurchaseDto.modified
-        }
-        const createdPurchase = new this.PurchaseModel(newPurchase);
+        const userId = String(createPurchaseDto.userId);
+        const newPurchaseDto = new CreatePurchaseDto(userId, productId, productInfo.name, productInfo.price);
+        const createdPurchase = new this.PurchaseModel(newPurchaseDto);
         return await createdPurchase.save();
     }
 
