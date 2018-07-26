@@ -6,6 +6,7 @@ import { RoleGuard } from '../authentication/auth.guard';
 import { Roles } from '../authentication/auth.decorator';
 import { ProductsService } from '../products/products.service';
 import { UserService} from '../users/users.service';
+import { PaymentService } from 'payment/payment.service';
 
 @Controller('purchase')
 @UseGuards(RoleGuard)
@@ -13,7 +14,8 @@ export class PurchaseController {
     constructor(
         private readonly purchaseService: PurchaseService,
         private readonly productsService: ProductsService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly paymentService: PaymentService
     ) {}
 
     @Post()
@@ -29,9 +31,9 @@ export class PurchaseController {
         }
         const userInfo = await this.userService.findById(request.user.id);
         const userTotalDebt = await this.purchaseService.getUserTotalDebt(request.user.id);
-        console.log('User\'s Credit: ', userInfo.creditLimit);
-        console.log('Actual debt: ', userTotalDebt);
-        if(userInfo.creditLimit <=  userTotalDebt){
+        const userTotalPayed = await this.paymentService.getUserTotalPaid(request.user.id);
+        const userUsedCredit = userTotalDebt - userTotalPayed;
+        if(userInfo.creditLimit <=  userUsedCredit){
            throw new HttpException('Already reach purchase Limit', HttpStatus.CONFLICT);
         }
         const newPurchase = new CreatePurchaseDto(request.user.id, productId);
