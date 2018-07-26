@@ -1,13 +1,15 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, UseGuards, Put, Patch, Param } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, UseGuards, Put, Patch, Param, Req } from '@nestjs/common';
 import { UsersDto } from './dto/users.dto';
 import { UserService } from './users.service';
 import { RoleGuard } from 'authentication/auth.guard';
 import { Roles } from 'authentication/auth.decorator';
 import { ValidateLimit } from './pipes/limit-validate.pipe';
 import { ValidateMongoId } from 'pipes/validate-mongoId.pipe';
+import { ValidateToken } from '../authentication/validatetoken.decorator';
+import { TokenGuard } from '../authentication/validtoken.guard';
 
 @Controller('users')
-@UseGuards(RoleGuard)
+@UseGuards(RoleGuard, TokenGuard)
 export class UsersController {
     constructor(private readonly userService: UserService) { }
     @Post('login')
@@ -17,20 +19,25 @@ export class UsersController {
         return this.userService.login(usersDto);
     }
     @Post('logout')
-    logout() {
-        return;
+    @ValidateToken()
+    logout(@Req() req) {
+      const { user: { uuid } } = req;
+      return this.userService.logout(uuid);
     }
     @Post()
+    @ValidateToken()
     @UsePipes(new ValidationPipe())
     create(@Body() usersDto: UsersDto) {
       return this.userService.signup(usersDto);
     }
     @Put()
+    @ValidateToken()
     @Roles('admin')
     updateGlobalDebtLimit(@Body('limit', new ValidateLimit()) limit) {
       return this.userService.updateCreditLimit(limit);
     }
     @Patch(':id')
+    @ValidateToken()
     @Roles('admin')
     updateCreditLimit(@Param('id', new ValidateMongoId()) user, @Body('limit', new ValidateLimit()) limit) {
       return this.userService.updateOneUserCreditLimit(user, limit);
