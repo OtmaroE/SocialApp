@@ -30,6 +30,9 @@ export class PaymentService {
 
     async getUserTotalPaid(userId): Promise<number> {
         const TotalPaymentReport = await this.findAll(userId);
+        if(!TotalPaymentReport[0]){
+            return 0;
+        }
         return TotalPaymentReport[0].totalPaid | 0;
     }
     

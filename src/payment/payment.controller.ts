@@ -13,13 +13,13 @@ export class PaymentController {
         private readonly paymentService: PaymentService
     ) {}
 
-    @Get()
+    @Get('total')
     @Roles('admin')
     findAll(@Req() request){
        return this.paymentService.findAll(request.user.id);
     }
 
-    @Get('details')
+    @Get()
     @Roles('admin')
     async findAllDetails(@Req() request) {
         return this.paymentService.findAllDetails(request.user.id);
