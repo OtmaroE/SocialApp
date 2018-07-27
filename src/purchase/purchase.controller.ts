@@ -7,8 +7,10 @@ import { Roles } from '../authentication/auth.decorator';
 import { ProductsService } from '../products/products.service';
 import { UserService} from '../users/users.service';
 import { PaymentService } from 'payment/payment.service';
+import { ApiUseTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 
 @Controller('purchases')
+@ApiUseTags('Purchases')
 @UseGuards(RoleGuard)
 export class PurchaseController {
     constructor(
@@ -20,6 +22,11 @@ export class PurchaseController {
 
     @Post()
     @Roles('admin')
+    @ApiBearerAuth()
+    @ApiResponse( { status: 201, description: 'Purchase was placed.' } )
+    @ApiResponse( { status: HttpStatus.BAD_REQUEST, description: 'Bad product id.' } )
+    @ApiResponse( { status: HttpStatus.BAD_REQUEST, description: 'Bad request.' } )
+    @ApiResponse( { status: HttpStatus.FORBIDDEN, description: 'Forbidden resource.' } )
     async create(@Body() createPurchaseDto: CreatePurchaseDto, @Req() request){
         const productId = String(createPurchaseDto.productId);
         if(productId.length !== 24){
@@ -42,12 +49,18 @@ export class PurchaseController {
 
     @Get()
     @Roles('admin')
+    @ApiBearerAuth()
+    @ApiResponse( { status: 200, description: 'List of purchase was generated.' } )
+    @ApiResponse( { status: HttpStatus.FORBIDDEN, description: 'Forbidden resource.' } )
     async findAllDetails(@Req() request): Promise<Purchase[]> {
         return this.purchaseService.findAllDetails(request.user.id);
     }
 
     @Get('debt')
     @Roles('admin')
+    @ApiBearerAuth()
+    @ApiResponse( { status: 200, description: 'Total user debt was calculated.'} )
+    @ApiResponse( { status: HttpStatus.FORBIDDEN, description: 'Forbidden resource.' } )
     async getUserTotalDebt(@Req() request): Promise<Object> {
         const userTotalDebt = await this.purchaseService.getUserTotalDebt(request.user.id);
         const userTotalPayed = await this.paymentService.getUserTotalPaid(request.user.id);

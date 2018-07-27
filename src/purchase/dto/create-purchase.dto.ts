@@ -1,5 +1,8 @@
+import { ApiModelProperty } from '@nestjs/swagger';
+
 export class CreatePurchaseDto {
     readonly userId: String;
+    @ApiModelProperty()
     readonly productId: String;
     readonly productName: String;
     readonly pricePaid: Number;
