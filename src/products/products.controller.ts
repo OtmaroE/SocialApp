@@ -1,4 +1,18 @@
-import { Controller, Get, Post, Patch, Delete, Param, Req, HttpCode, Body, ValidationPipe, UsePipes, BadRequestException } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Patch,
+    Delete,
+    Param,
+    Req,
+    HttpCode,
+    Body,
+    ValidationPipe,
+    UsePipes,
+    BadRequestException,
+    ForbiddenException,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { PurchaseService } from '../purchase/purchase.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -7,6 +21,8 @@ import { PatchProductDto } from './dto/patch-product.dto';
 import { Product } from './interfaces/product.interface';
 import { Purchase } from '../purchase/interfaces/purchase.interface';
 import { Validator } from 'class-validator';
+import { Roles } from '../decorators/roles.decorator';
+import * as jwt from 'jsonwebtoken';
 import { ApiUseTags, ApiBearerAuth, ApiResponse, ApiConsumes } from '@nestjs/swagger';
 const validator = new Validator();
 
@@ -20,7 +36,7 @@ export class ProductsController {
 
     @Get()
     @ApiBearerAuth()
-    @ApiResponse( { status: 200, description: 'List of products was generated.' })
+    @ApiResponse({ status: 200, description: 'List of products was generated.' })
     findAll(): Promise<Product[]> {
         return this.productsService.findAll();
     }
@@ -42,11 +58,15 @@ export class ProductsController {
         return this.productsService.create(createProductDto);
     }
 
-    @Post(':id/purchase')
+    @Post(':id/purchases')
     @ApiBearerAuth()
     @ApiResponse({ status: 201, description: 'Purchase was registered.' })
+    @Roles('user', 'admin')
     createPurchase(@Param('id') id: string, @Req() req): Promise<Purchase> {
-        const createPurchaseDto = new CreatePurchaseDto(req.user.id, id);
+        const token = req.headers ? req.headers.authorization : null;
+        if (!token) throw new ForbiddenException();
+        const user = jwt.decode(token);
+        const createPurchaseDto = new CreatePurchaseDto(user.id, id);
         return this.purchaseService.create(createPurchaseDto);
     }
 
@@ -61,7 +81,7 @@ export class ProductsController {
 
     @Delete(':id')
     @ApiBearerAuth()
-    @ApiResponse({ status: 204, description: 'Product was deleted.'})
+    @ApiResponse({ status: 204, description: 'Product was deleted.' })
     @HttpCode(204)
     deleteById(@Param('id') id: string) {
         if (!validator.isMongoId(id)) throw new BadRequestException();
