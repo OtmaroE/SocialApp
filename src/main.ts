@@ -9,7 +9,7 @@ async function bootstrap() {
         .setTitle('Bistec API')
         .setDescription('Owed payment record keeping for `el bistec`')
         .setVersion('1.0')
-        .addBearerAuth('Json Web Token','header')
+        .addBearerAuth('Authorization','header')
         .setBasePath('api')
         .build();
     const document = SwaggerModule.createDocument(app, options);
