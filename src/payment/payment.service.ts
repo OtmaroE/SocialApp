@@ -18,20 +18,19 @@ export class PaymentService {
         .match({ userId })
         .group({ _id: '$userId', totalPaid: { $sum: '$amountPayed'}})
         .project({ _id: 0, Userid: '$_id', totalPaid: '$totalPaid'})
-        .exec()
+        .exec();
     }
     async findAllDetails(userId): Promise<Payment> {
         return await this.PaymentModel.find({ userId });
     }
     async pay(createPaymentDto: CreatePaymentDto): Promise<Payment> {
-        let payment = await this.PaymentModel.create(createPaymentDto);
-        return payment;
+        return await this.PaymentModel.create(createPaymentDto);
     }
 
     async getUserTotalPaid(userId): Promise<number> {
         const TotalPaymentReport = await this.findAll(userId);
-        if(!TotalPaymentReport[0]){
-            return 0
+        if (!TotalPaymentReport[0]) {
+            return 0;
         }
         return TotalPaymentReport[0].totalPaid || 0;
     }
