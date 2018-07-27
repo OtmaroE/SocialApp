@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, BadRequestException, UseGuards, HttpCode ,Req, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, BadRequestException, UseGuards, Req, ConflictException } from '@nestjs/common';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { PurchaseService } from './purchase.service';
 import { Purchase } from './interfaces/purchase.interface';
@@ -7,6 +7,7 @@ import { Roles } from '../authentication/auth.decorator';
 import { ProductsService } from '../products/products.service';
 import { UserService} from '../users/users.service';
 import { PaymentService } from 'payment/payment.service';
+import { ValidateMongoId } from '../pipes/validate-mongoId.pipe';
 
 @Controller('purchases')
 @UseGuards(RoleGuard)
@@ -15,26 +16,22 @@ export class PurchaseController {
         private readonly purchaseService: PurchaseService,
         private readonly productsService: ProductsService,
         private readonly userService: UserService,
-        private readonly paymentService: PaymentService
+        private readonly paymentService: PaymentService,
     ) {}
 
     @Post()
     @Roles('admin')
-    async create(@Body() createPurchaseDto: CreatePurchaseDto, @Req() request){
-        const productId = String(createPurchaseDto.productId);
-        if(productId.length !== 24){
-            throw new HttpException('Bad Prodict Id', HttpStatus.BAD_REQUEST);
-        }
-        const productExistance = await this.productsService.findOne(productId);
-        if(!productExistance){
-             throw new BadRequestException();
-        }
-        const userInfo = await this.userService.findById(request.user.id);
-        const userTotalDebt = await this.purchaseService.getUserTotalDebt(request.user.id);
-        const userTotalPayed = await this.paymentService.getUserTotalPaid(request.user.id);
-        const userUsedCredit = userTotalDebt - userTotalPayed;
-        if(userInfo.creditLimit <=  userUsedCredit){
-           throw new HttpException('Already reach purchase Limit', HttpStatus.CONFLICT);
+    async create(@Body('productId', new ValidateMongoId()) productId: string, @Req() request) {
+        const { user: { id }} = request;
+        const findProduct = this.productsService.findOne(productId);
+        const getUserInfo = this.userService.findById(id);
+        const getDebt = this.purchaseService.getUserTotalDebt(id);
+        const getPaid = this.paymentService.getUserTotalPaid(id);
+        const [product, userInfo, userTotalDebt, userTotalPaid] = await Promise.all([findProduct, getUserInfo, getDebt, getPaid]);
+        if (!product) throw new BadRequestException();
+        const userUsedCredit = userTotalDebt - userTotalPaid + product.price;
+        if (userInfo.creditLimit <=  userUsedCredit) {
+           throw new ConflictException('Credit limit reached');
         }
         const newPurchase = new CreatePurchaseDto(request.user.id, productId);
         return this.purchaseService.create(newPurchase);
@@ -48,13 +45,13 @@ export class PurchaseController {
 
     @Get('debt')
     @Roles('admin')
-    async getUserTotalDebt(@Req() request): Promise<Object> {
+    async getUserTotalDebt(@Req() request): Promise<object> {
         const userTotalDebt = await this.purchaseService.getUserTotalDebt(request.user.id);
         const userTotalPayed = await this.paymentService.getUserTotalPaid(request.user.id);
         const userUsedCredit = userTotalDebt - userTotalPayed;
         return  {
             userId: request.user.id,
-            debt: userUsedCredit
-        }
+            debt: userUsedCredit,
+        };
     }
 }
