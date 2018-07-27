@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, BadRequestException, UseGuards, Req, ConflictException } from '@nestjs/common';
+import { Controller, Get, Post, Body, BadRequestException, UseGuards, Req, ConflictException, HttpStatus } from '@nestjs/common';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { PurchaseService } from './purchase.service';
 import { Purchase } from './interfaces/purchase.interface';
