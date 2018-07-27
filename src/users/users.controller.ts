@@ -7,6 +7,8 @@ import { ValidateLimit } from './pipes/limit-validate.pipe';
 import { ValidateMongoId } from 'pipes/validate-mongoId.pipe';
 import { ValidateToken } from '../authentication/validatetoken.decorator';
 import { TokenGuard } from '../authentication/validtoken.guard';
+import { HashPasswordPipe } from 'pipes/hash-password.pipe';
+import { CreateUser } from './dto/create-user.dto';
 
 @Controller('users')
 @UseGuards(RoleGuard, TokenGuard)
@@ -25,13 +27,13 @@ export class UsersController {
         return this.userService.logout(uuid);
     }
     @Post()
-    @UsePipes(new ValidationPipe())
-    create(@Body() usersDto: UsersDto) {
-        return this.userService.signup(usersDto);
+    @UsePipes(new ValidationPipe(), new HashPasswordPipe())
+    create(@Body() user: CreateUser) {
+        return this.userService.signup(user);
     }
     @Put()
     @ValidateToken()
-    @Roles('user')
+    @Roles('admin')
     updateGlobalDebtLimit(@Body('limit', new ValidateLimit()) limit) {
         return this.userService.updateCreditLimit(limit);
     }

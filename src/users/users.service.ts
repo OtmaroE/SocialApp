@@ -9,6 +9,7 @@ import { UserInfo } from './interface/user-info.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { createJWT } from './helpers/jwt';
 import client from './helpers/redis';
+import { CreateUser } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -21,7 +22,7 @@ export class UserService {
     login(user: UsersDto): Promise<object> {
         return this.userModel.findOne({ username: user.username }).exec().then(async (userFound) => {
             if (!userFound || !userFound.comparePass(user.password)) throw new UnauthorizedException('Invalid credentials');
-            const userRoles = await this.roleMappingModel.find({ userId: user._id }).populate('roleId', '-_id name').exec();
+            const userRoles = await this.roleMappingModel.find({ userId: userFound._id }).populate('roleId', '-_id name').exec();
             const parsedRoles = userRoles.map(role => {
                 return role.roleId.name;
             });
@@ -32,16 +33,20 @@ export class UserService {
         return await this.userModel.findOne({ _id }).select('username creditLimit').exec();
     }
 
-    signup(user: UsersDto): Promise<User> {
-        return this.userModel.create({ username: user.username, password: this.userModel.hashPassword(user.password) })
+    signup(user: CreateUser): Promise<User> {
+        return this.userModel.create({ username: user.username, password: user.password })
             .then(async userCreated => {
-                const role = await this.roleModel.findOne({ name: user.role || 'user' });
+                const role = await this.roleModel.findOne({ name: user.role });
                 if (!role) throw new NotFoundException('Role does not exist');
-                const createRoleMappingDto = new CreateRoleMappingDto(user._id, role._id);
+                const createRoleMappingDto = new CreateRoleMappingDto(userCreated._id, role._id);
                 const createdRoleMapping = new this.roleMappingModel(createRoleMappingDto);
-                const roleMapping = await createdRoleMapping.save();
+                await createdRoleMapping.save();
                 const userToReturn = { id: userCreated._id, username: userCreated.username, limit: userCreated.creditLimit };
                 return userToReturn;
+            })
+            .catch(err => {
+              if (err.code === 11000) throw new ConflictException('User already exists');
+              throw new InternalServerErrorException(err.message);
             });
     }
     async updateCreditLimit(creditLimit: number): Promise<object> {
