@@ -4,6 +4,7 @@ import { UsersDto } from './dto/users.dto';
 import { User } from './interface/users.interface';
 import { Role } from '../roles/interfaces/role.interface';
 import { RoleMapping } from '../role-mappings/interfaces/role-mapping.interface';
+import { CreateRoleMappingDto } from '../role-mappings/dto/create-role-mapping.dto';
 import { UserInfo } from './interface/user-info.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { createJWT } from './helpers/jwt';
@@ -33,7 +34,12 @@ export class UserService {
 
     signup(user: UsersDto): Promise<User> {
         return this.userModel.create({ username: user.username, password: this.userModel.hashPassword(user.password) })
-            .then(userCreated => {
+            .then(async userCreated => {
+                const role = await this.roleModel.findOne({ name: user.role || 'user' });
+                if (!role) throw new NotFoundException('Role does not exist');
+                const createRoleMappingDto = new CreateRoleMappingDto(user._id, role._id);
+                const createdRoleMapping = new this.roleMappingModel(createRoleMappingDto);
+                const roleMapping = await createdRoleMapping.save();
                 const userToReturn = { id: userCreated._id, username: userCreated.username, limit: userCreated.creditLimit };
                 return userToReturn;
             });

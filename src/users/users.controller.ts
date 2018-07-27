@@ -21,24 +21,24 @@ export class UsersController {
     @Post('logout')
     @ValidateToken()
     logout(@Req() req) {
-      const { user: { uuid } } = req;
-      return this.userService.logout(uuid);
+        const { user: { uuid } } = req;
+        return this.userService.logout(uuid);
     }
     @Post()
     @UsePipes(new ValidationPipe())
     create(@Body() usersDto: UsersDto) {
-      return this.userService.signup(usersDto);
+        return this.userService.signup(usersDto);
     }
     @Put()
     @ValidateToken()
-    @Roles('admin')
+    @Roles('user')
     updateGlobalDebtLimit(@Body('limit', new ValidateLimit()) limit) {
-      return this.userService.updateCreditLimit(limit);
+        return this.userService.updateCreditLimit(limit);
     }
     @Patch(':id')
     @ValidateToken()
     @Roles('admin')
     updateCreditLimit(@Param('id', new ValidateMongoId()) user, @Body('limit', new ValidateLimit()) limit) {
-      return this.userService.updateOneUserCreditLimit(user, limit);
+        return this.userService.updateOneUserCreditLimit(user, limit);
     }
 }
