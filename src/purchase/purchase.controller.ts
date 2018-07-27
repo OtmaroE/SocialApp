@@ -11,6 +11,8 @@ import { ApiUseTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { ValidateMongoId } from '../pipes/validate-mongoId.pipe';
 import { ValidateToken } from '../authentication/validatetoken.decorator';
 import { TokenGuard } from '../authentication/validtoken.guard';
+import { user } from 'decorators/user.param.decorator';
+import { ValidateNumber } from '../pipes/validate-number.pipe';
 
 @Controller('purchases')
 @UseGuards(RoleGuard, TokenGuard)
@@ -31,20 +33,23 @@ export class PurchaseController {
     @ApiResponse( { status: HttpStatus.BAD_REQUEST, description: 'Bad product id.' } )
     @ApiResponse( { status: HttpStatus.BAD_REQUEST, description: 'Bad request.' } )
     @ApiResponse( { status: HttpStatus.FORBIDDEN, description: 'Forbidden resource.' } )
-    async create(@Body('productId', new ValidateMongoId()) productId: string, @Req() request) {
-        const { user: { id }} = request;
-        const findProduct = this.productsService.findOne(productId);
-        const getUserInfo = this.userService.findById(id);
-        const getDebt = this.purchaseService.getUserTotalDebt(id);
-        const getPaid = this.paymentService.getUserTotalPaid(id);
-        const [product, userInfo, userTotalDebt, userTotalPaid] = await Promise.all([findProduct, getUserInfo, getDebt, getPaid]);
-        if (!product) throw new BadRequestException();
-        const userUsedCredit = userTotalDebt - userTotalPaid + product.price;
-        if (userInfo.creditLimit <=  userUsedCredit) {
-           throw new ConflictException('Credit limit reached');
-        }
-        const newPurchase = new CreatePurchaseDto(request.user.id, productId);
-        return this.purchaseService.create(newPurchase);
+    async create(
+        @Body('productId', new ValidateMongoId()) productId: string,
+        @Body('quantity', new ValidateNumber())
+        @Req() request,
+        @user('id') id) {
+            const findProduct = this.productsService.findOne(productId);
+            const getUserInfo = this.userService.findById(id);
+            const getDebt = this.purchaseService.getUserTotalDebt(id);
+            const getPaid = this.paymentService.getUserTotalPaid(id);
+            const [product, userInfo, userTotalDebt, userTotalPaid] = await Promise.all([findProduct, getUserInfo, getDebt, getPaid]);
+            if (!product) throw new BadRequestException();
+            const userUsedCredit = userTotalDebt - userTotalPaid + (product.price);
+            if (userInfo.creditLimit <=  userUsedCredit) {
+            throw new ConflictException('Credit limit reached');
+            }
+            const newPurchase = new CreatePurchaseDto(request.user.id, productId);
+            return this.purchaseService.create(newPurchase);
     }
 
     @Get()

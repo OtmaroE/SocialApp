@@ -45,8 +45,8 @@ export class PurchaseService {
             .group({ _id: '$userId', totalOwed: { $sum: '$pricePaid' } })
             .exec();
         if (!totalOwedReport[0]) {
-            return 0
+            return 0;
         }
-        return totalOwedReport[0].totalOwed | 0;
+        return totalOwedReport[0].totalOwed || 0;
     }
 }
