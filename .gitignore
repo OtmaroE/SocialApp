@@ -131,6 +131,11 @@ typings/
 !.vscode/launch.json
 !.vscode/extensions.json
 
+### Redis ###
+# Ignore redis binary dump (dump.rdb) files
+
+*.rdb
+
 
 # End of https://www.gitignore.io/api/node,emacs,visualstudiocode
 
