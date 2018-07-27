@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsMongoId, IsOptional } from 'class-validator';
+import { ApiModelProperty } from '@nestjs/swagger';
 
 export class UsersDto {
     @IsOptional()
