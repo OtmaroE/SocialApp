@@ -2568,7 +2568,7 @@ fast-safe-stringify@^1.0.8, fast-safe-stringify@^1.2.3:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/fast-safe-stringify/-/fast-safe-stringify-1.2.3.tgz#9fe22c37fb2f7f86f06b8f004377dbf8f1ee7bc1"
 
-fastify-formbody@^2.0.0:
+fastify-formbody@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/fastify-formbody/-/fastify-formbody-2.0.1.tgz#9c5921326122f4f02aaa41346bf8ef58386bdfd3"
   dependencies:
