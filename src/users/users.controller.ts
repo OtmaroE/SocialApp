@@ -7,7 +7,9 @@ import { ValidateLimit } from './pipes/limit-validate.pipe';
 import { ValidateMongoId } from 'pipes/validate-mongoId.pipe';
 import { ValidateToken } from '../authentication/validatetoken.decorator';
 import { TokenGuard } from '../authentication/validtoken.guard';
-import { ApiUseTags, ApiOAuth2Auth, ApiResponse, ApiImplicitHeader, ApiBearerAuth, ApiImplicitBody } from '@nestjs/swagger';
+import { HashPasswordPipe } from 'pipes/hash-password.pipe';
+import { CreateUser } from './dto/create-user.dto';
+import { ApiUseTags, ApiResponse, ApiBearerAuth, ApiImplicitBody } from '@nestjs/swagger';
 
 @Controller('users')
 @UseGuards(RoleGuard, TokenGuard)
@@ -25,14 +27,14 @@ export class UsersController {
     @ApiBearerAuth()
     @ValidateToken()
     logout(@Req() req) {
-      const { user: { uuid } } = req;
-      return this.userService.logout(uuid);
+        const { user: { uuid } } = req;
+        return this.userService.logout(uuid);
     }
     @Post()
-    @UsePipes(new ValidationPipe())
+    @UsePipes(new ValidationPipe(), new HashPasswordPipe())
     @ApiBearerAuth()
-    create(@Body() usersDto: UsersDto) {
-      return this.userService.signup(usersDto);
+    create(@Body() user: CreateUser) {
+        return this.userService.signup(user);
     }
     @Put()
     @ValidateToken()
@@ -40,13 +42,13 @@ export class UsersController {
     @ApiBearerAuth()
     @ApiImplicitBody({ name: 'limit', description: 'new limit for user.', type: Number })
     updateGlobalDebtLimit(@Body('limit', new ValidateLimit()) limit) {
-      return this.userService.updateCreditLimit(limit);
+        return this.userService.updateCreditLimit(limit);
     }
     @Patch(':id')
     @ValidateToken()
     @Roles('admin')
     @ApiBearerAuth()
     updateCreditLimit(@Param('id', new ValidateMongoId()) user, @Body('limit', new ValidateLimit()) limit) {
-      return this.userService.updateOneUserCreditLimit(user, limit);
+        return this.userService.updateOneUserCreditLimit(user, limit);
     }
 }

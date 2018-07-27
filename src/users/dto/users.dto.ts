@@ -1,16 +1,24 @@
-import { IsString, IsNotEmpty } from 'class-validator';
-import { ApiModelProperty } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsMongoId, IsOptional } from 'class-validator';
 
 export class UsersDto {
-  @IsString()
-  @IsNotEmpty()
-  @ApiModelProperty()
-  readonly username: string;
+    @IsOptional()
+    @IsMongoId()
+    readonly _id: string;
 
-  @IsString()
-  @ApiModelProperty()
-  @IsNotEmpty({
-    message: 'Password cant be empty',
-  })
-  readonly password: string;
+    @IsString()
+    @IsNotEmpty()
+    @ApiModelProperty()
+    readonly username: string;
+
+    @IsString()
+    @IsNotEmpty({
+        message: 'Password cant be empty',
+    })
+    @ApiModelProperty()
+    readonly password: string;
+
+    @IsOptional()
+    @IsString()
+    @ApiModelProperty()
+    readonly role?: string;
 }

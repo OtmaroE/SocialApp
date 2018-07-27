@@ -7,13 +7,13 @@ import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class PurchaseService {
-    constructor( 
+    constructor(
         @InjectModel('Purchase') private readonly PurchaseModel: Model<Purchase>,
         private readonly productsService: ProductsService,
-    ) {}
+    ) { }
 
     async create(createPurchaseDto: CreatePurchaseDto): Promise<Purchase> {
-        const productId = String(createPurchaseDto.productId)
+        const productId = String(createPurchaseDto.productId);
         const productInfo = await this.productsService.findOne(productId);
         const userId = String(createPurchaseDto.userId);
         const newPurchaseDto = new CreatePurchaseDto(userId, productId, productInfo.name, productInfo.price);
@@ -23,28 +23,28 @@ export class PurchaseService {
 
     async findAllDetails(userId: string): Promise<Purchase[]> {
         return await this.PurchaseModel
-        .aggregate()
-        .match({ userId })
-        .group({ _id: '$productName', pricePaid: { $sum: 1 }, total: { $sum: '$pricePaid' }, created: { $max: '$created' } })
-        .project({ _id: 0, Product: '$_id', lasPurchase: '$created', items: '$pricePaid', total: '$total' })
-        .exec();
+            .aggregate()
+            .match({ userId })
+            .group({ _id: '$productName', pricePaid: { $sum: 1 }, total: { $sum: '$pricePaid' }, created: { $max: '$created' } })
+            .project({ _id: 0, Product: '$_id', lasPurchase: '$created', items: '$pricePaid', total: '$total' })
+            .exec();
     }
 
     async findAll(userId: string): Promise<Purchase[]> {
         return await this.PurchaseModel
-        .aggregate()
-        .match({ userId })
-        .group({ _id: '$userId', totalOwed: { $sum: '$pricePaid' } })
-        .exec();
+            .aggregate()
+            .match({ userId })
+            .group({ _id: '$userId', totalOwed: { $sum: '$pricePaid' } })
+            .exec();
     }
 
     async getUserTotalDebt(userId: string): Promise<number> {
         const totalOwedReport = await this.PurchaseModel
-        .aggregate()
-        .match({ userId })
-        .group({ _id: '$userId', totalOwed: { $sum: '$pricePaid'}})
-        .exec();
-        if(!totalOwedReport[0]){
+            .aggregate()
+            .match({ userId })
+            .group({ _id: '$userId', totalOwed: { $sum: '$pricePaid' } })
+            .exec();
+        if (!totalOwedReport[0]) {
             return 0
         }
         return totalOwedReport[0].totalOwed | 0;

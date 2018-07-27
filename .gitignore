@@ -4,6 +4,7 @@
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~
+restclient
 \#*\#
 /.emacs.desktop
 /.emacs.desktop.lock
@@ -129,6 +130,11 @@ typings/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+### Redis ###
+# Ignore redis binary dump (dump.rdb) files
+
+*.rdb
 
 
 # End of https://www.gitignore.io/api/node,emacs,visualstudiocode
