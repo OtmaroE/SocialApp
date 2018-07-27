@@ -10,6 +10,8 @@ export class TokenGuard implements CanActivate {
   async canActivate(
     context: ExecutionContext,
   ): Promise<boolean> {
+    const token = this.reflector.get<string>('token', context.getHandler());
+    if (token !== '') return true;
     const request = context.switchToHttp().getRequest();
     const { user } = request;
     return await get(user.uuid);
