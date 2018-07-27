@@ -8,9 +8,11 @@ import { ProductsService } from '../products/products.service';
 import { UserService} from '../users/users.service';
 import { PaymentService } from 'payment/payment.service';
 import { ValidateMongoId } from '../pipes/validate-mongoId.pipe';
+import { ValidateToken } from '../authentication/validatetoken.decorator';
+import { TokenGuard } from '../authentication/validtoken.guard';
 
 @Controller('purchases')
-@UseGuards(RoleGuard)
+@UseGuards(RoleGuard, TokenGuard)
 export class PurchaseController {
     constructor(
         private readonly purchaseService: PurchaseService,
@@ -20,6 +22,7 @@ export class PurchaseController {
     ) {}
 
     @Post()
+    @ValidateToken()
     @Roles('admin')
     async create(@Body('productId', new ValidateMongoId()) productId: string, @Req() request) {
         const { user: { id }} = request;
@@ -38,12 +41,14 @@ export class PurchaseController {
     }
 
     @Get()
+    @ValidateToken()
     @Roles('admin')
     async findAllDetails(@Req() request): Promise<Purchase[]> {
         return this.purchaseService.findAllDetails(request.user.id);
     }
 
     @Get('debt')
+    @ValidateToken()
     @Roles('admin')
     async getUserTotalDebt(@Req() request): Promise<object> {
         const userTotalDebt = await this.purchaseService.getUserTotalDebt(request.user.id);
