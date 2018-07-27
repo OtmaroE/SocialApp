@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, NotFoundException, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { UsersDto } from './dto/users.dto';
 import { User } from './interface/users.interface';
 import { UserInfo } from './interface/user-info.interface';
@@ -25,6 +25,10 @@ export class UserService {
       .then(userCreated => {
         const userToReturn = { id: userCreated._id, username: userCreated.username, limit: userCreated.creditLimit };
         return userToReturn;
+      })
+      .catch(err => {
+        if (err.code === 11000) throw new ConflictException('Srry, this user already exists');
+        else throw new InternalServerErrorException(err.message);
       });
   }
   async updateCreditLimit(creditLimit: number): Promise<object> {
