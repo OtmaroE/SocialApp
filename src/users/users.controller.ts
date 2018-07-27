@@ -25,7 +25,6 @@ export class UsersController {
       return this.userService.logout(uuid);
     }
     @Post()
-    @ValidateToken()
     @UsePipes(new ValidationPipe())
     create(@Body() usersDto: UsersDto) {
       return this.userService.signup(usersDto);
