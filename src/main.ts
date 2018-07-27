@@ -10,6 +10,7 @@ async function bootstrap() {
         .setDescription('Owed payment record keeping for `el bistec`')
         .setVersion('1.0')
         .addBearerAuth('Authorization','header')
+        .setBasePath('api')
         .build();
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('explorer', app, document);
