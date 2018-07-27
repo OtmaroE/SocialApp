@@ -7,15 +7,18 @@ export class UsersDto {
 
     @IsString()
     @IsNotEmpty()
+    @ApiModelProperty()
     readonly username: string;
 
     @IsString()
     @IsNotEmpty({
         message: 'Password cant be empty',
     })
+    @ApiModelProperty()
     readonly password: string;
 
     @IsOptional()
     @IsString()
+    @ApiModelProperty()
     readonly role?: string;
 }

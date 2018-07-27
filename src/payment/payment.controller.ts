@@ -1,13 +1,14 @@
-import { Controller, Get, Post, Body, UseGuards, Req, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req, HttpException, HttpStatus, ValidationPipe } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/payment.dto';
 import { PaymentService } from './payment.service';
-import { Payment } from './interfaces/payment.interface';
 import { RoleGuard } from '../authentication/auth.guard';
 import { Roles } from '../authentication/auth.decorator';
-import { create } from 'domain';
+import { ApiUseTags, ApiBearerAuth, ApiResponse, ApiImplicitBody, ApiConsumes, ApiImplicitParam } from '@nestjs/swagger';
+import { ValidateNumber } from 'pipes/validate-number.pipe';
 
 @Controller('payments')
 @UseGuards(RoleGuard)
+@ApiUseTags('Payments')
 export class PaymentController {
     constructor(
         private readonly paymentService: PaymentService
@@ -15,25 +16,31 @@ export class PaymentController {
 
     @Get('total')
     @Roles('admin')
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, description: 'Payment list generated.' })
     findAll(@Req() request){
        return this.paymentService.findAll(request.user.id);
     }
 
     @Get()
     @Roles('admin')
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, description: 'Payment list generatd.' })
     async findAllDetails(@Req() request) {
         return this.paymentService.findAllDetails(request.user.id);
     }
     
     @Post()
     @Roles('admin')
-    async create(@Body() jsonBody, @Req() request){
+    @ApiBearerAuth()
+    @ApiImplicitBody({ name: 'pay', description: 'Amount to be paid ', type: Number })
+    @ApiResponse( { status: 201, description: 'Payment was received.' } )
+    async create(@Body('pay', new ValidateNumber()) pay: number, @Req() request){
         const userId = request.user.id;
-        const amountPaid = jsonBody.pay;
-        if(!amountPaid){
+        if(!pay){
             throw new HttpException('Bad pay value', HttpStatus.BAD_REQUEST);
         }
-        const createPaymentDto = new CreatePaymentDto(userId, amountPaid);
+        const createPaymentDto = new CreatePaymentDto(userId, pay);
         return await this.paymentService.pay(createPaymentDto);
     }
 }
