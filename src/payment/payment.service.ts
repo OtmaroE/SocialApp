@@ -7,7 +7,7 @@ import { PurchaseService } from 'purchase/purchase.service';
 
 @Injectable()
 export class PaymentService {
-    constructor( 
+    constructor(
         @InjectModel('Payment') private readonly PaymentModel: Model<Payment>,
         private readonly purchaseService: PurchaseService,
     ) { }
@@ -30,7 +30,10 @@ export class PaymentService {
 
     async getUserTotalPaid(userId): Promise<number> {
         const TotalPaymentReport = await this.findAll(userId);
-        return TotalPaymentReport[0].totalPaid | 0;
+        if(!TotalPaymentReport[0]){
+            return 0
+        }
+        return TotalPaymentReport[0].totalPaid || 0;
     }
-    
+
 }
