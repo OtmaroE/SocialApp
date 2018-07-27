@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, NotFoundException, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { UsersDto } from './dto/users.dto';
 import { User } from './interface/users.interface';
 import { Role } from '../roles/interfaces/role.interface';
