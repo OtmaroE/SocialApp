@@ -16,7 +16,7 @@ export class PaymentService {
         return await this.PaymentModel
         .aggregate()
         .match({ userId })
-        .group({ _id: '$userId', totalPaid: { $sum: '$amountPayed'}})
+        .group({ _id: '$userId', totalPaid: { $sum: '$amountPaid'}})
         .project({ _id: 0, Userid: '$_id', totalPaid: '$totalPaid'})
         .exec();
     }
