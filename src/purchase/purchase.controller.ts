@@ -7,7 +7,7 @@ import { Roles } from '../authentication/auth.decorator';
 import { ProductsService } from '../products/products.service';
 import { UserService} from '../users/users.service';
 import { PaymentService } from 'payment/payment.service';
-import { ApiUseTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiBearerAuth, ApiResponse, ApiImplicitBody } from '@nestjs/swagger';
 import { ValidateMongoId } from '../pipes/validate-mongoId.pipe';
 import { ValidateToken } from '../authentication/validatetoken.decorator';
 import { TokenGuard } from '../authentication/validtoken.guard';
@@ -31,6 +31,7 @@ export class PurchaseController {
     @ApiResponse( { status: HttpStatus.BAD_REQUEST, description: 'Bad product id.' } )
     @ApiResponse( { status: HttpStatus.BAD_REQUEST, description: 'Bad request.' } )
     @ApiResponse( { status: HttpStatus.FORBIDDEN, description: 'Forbidden resource.' } )
+    @ApiImplicitBody({ name: 'productId', type: String })
     async create(@Body('productId', new ValidateMongoId()) productId: string, @Req() request) {
         const { user: { id }} = request;
         const findProduct = this.productsService.findOne(productId);
