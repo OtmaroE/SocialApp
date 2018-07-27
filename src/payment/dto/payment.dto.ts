@@ -1,5 +1,3 @@
-import { ApiModelProperty } from '@nestjs/swagger';
-
 export class CreatePaymentDto {
     readonly userId: String;
     readonly amountPaid: Number;
