@@ -4,6 +4,7 @@
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~
+restclient
 \#*\#
 /.emacs.desktop
 /.emacs.desktop.lock
