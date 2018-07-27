@@ -1,6 +1,7 @@
-import { IsString, IsNotEmpty, IsMongoId } from 'class-validator';
+import { IsString, IsNotEmpty, IsMongoId, IsOptional } from 'class-validator';
 
 export class UsersDto {
+    @IsOptional()
     @IsMongoId()
     readonly _id: string;
 
@@ -13,4 +14,8 @@ export class UsersDto {
         message: 'Password cant be empty',
     })
     readonly password: string;
+
+    @IsOptional()
+    @IsString()
+    readonly role?: string;
 }
