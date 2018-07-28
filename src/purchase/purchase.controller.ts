@@ -1,11 +1,9 @@
-import { Controller, Get, Post, Body, BadRequestException, UseGuards, Req, ConflictException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req, HttpStatus } from '@nestjs/common';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { PurchaseService } from './purchase.service';
 import { Purchase } from './interfaces/purchase.interface';
 import { RoleGuard } from '../authentication/auth.guard';
 import { Roles } from '../authentication/auth.decorator';
-import { ProductsService } from '../products/products.service';
-import { UserService} from '../users/users.service';
 import { PaymentService } from 'payment/payment.service';
 import { ApiUseTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { ValidateMongoId } from '../pipes/validate-mongoId.pipe';
@@ -20,8 +18,6 @@ import { ValidateNumber } from '../pipes/validate-number.pipe';
 export class PurchaseController {
     constructor(
         private readonly purchaseService: PurchaseService,
-        private readonly productsService: ProductsService,
-        private readonly userService: UserService,
         private readonly paymentService: PaymentService,
     ) {}
 
@@ -35,23 +31,11 @@ export class PurchaseController {
     @ApiResponse( { status: HttpStatus.FORBIDDEN, description: 'Forbidden resource.' } )
     async create(
         @Body('productId', new ValidateMongoId()) productId: string,
-        @Body('quantity', new ValidateNumber())
-        @Req() request,
+        @Body('quantity', new ValidateNumber()) quantity: number = 1,
         @user('id') id) {
-            const findProduct = this.productsService.findOne(productId);
-            const getUserInfo = this.userService.findById(id);
-            const getDebt = this.purchaseService.getUserTotalDebt(id);
-            const getPaid = this.paymentService.getUserTotalPaid(id);
-            const [product, userInfo, userTotalDebt, userTotalPaid] = await Promise.all([findProduct, getUserInfo, getDebt, getPaid]);
-            if (!product) throw new BadRequestException();
-            const userUsedCredit = userTotalDebt - userTotalPaid + (product.price);
-            if (userInfo.creditLimit <=  userUsedCredit) {
-            throw new ConflictException('Credit limit reached');
-            }
-            const newPurchase = new CreatePurchaseDto(request.user.id, productId);
+            const newPurchase = new CreatePurchaseDto(id, productId, quantity);
             return this.purchaseService.create(newPurchase);
     }
-
     @Get()
     @ValidateToken()
     @Roles('admin')
