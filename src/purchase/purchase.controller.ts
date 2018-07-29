@@ -1,16 +1,15 @@
-import { Controller, Get, Post, Body, UseGuards, Req, HttpStatus } from '@nestjs/common';
-import { CreatePurchaseDto } from './dto/create-purchase.dto';
+import { Controller, Get, Post, Body, UseGuards, Req, HttpStatus, UsePipes } from '@nestjs/common';
 import { PurchaseService } from './purchase.service';
 import { Purchase } from './interfaces/purchase.interface';
 import { RoleGuard } from '../authentication/auth.guard';
 import { Roles } from '../authentication/auth.decorator';
 import { PaymentService } from 'payment/payment.service';
 import { ApiUseTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
-import { ValidateMongoId } from '../pipes/validate-mongoId.pipe';
 import { ValidateToken } from '../authentication/validatetoken.decorator';
 import { TokenGuard } from '../authentication/validtoken.guard';
 import { user } from 'decorators/user.param.decorator';
-import { ValidateNumber } from '../pipes/validate-number.pipe';
+import { PurchaseListDto } from './dto/list-purchase.dto';
+import { ValidatePurchaseList } from '../pipes/validate-list';
 
 @Controller('purchases')
 @UseGuards(RoleGuard, TokenGuard)
@@ -24,17 +23,16 @@ export class PurchaseController {
     @Post()
     @ValidateToken()
     @Roles('admin')
+    @UsePipes(new ValidatePurchaseList())
     @ApiBearerAuth()
     @ApiResponse( { status: 201, description: 'Purchase was placed.' } )
     @ApiResponse( { status: HttpStatus.BAD_REQUEST, description: 'Bad product id.' } )
     @ApiResponse( { status: HttpStatus.BAD_REQUEST, description: 'Bad request.' } )
     @ApiResponse( { status: HttpStatus.FORBIDDEN, description: 'Forbidden resource.' } )
     async create(
-        @Body('productId', new ValidateMongoId()) productId: string,
-        @Body('quantity', new ValidateNumber()) quantity: number = 1,
+        @Body() purchaseList: PurchaseListDto,
         @user('id') id) {
-            const newPurchase = new CreatePurchaseDto(id, productId, quantity);
-            return this.purchaseService.create(newPurchase);
+            return this.purchaseService.create(purchaseList, id);
     }
     @Get()
     @ValidateToken()

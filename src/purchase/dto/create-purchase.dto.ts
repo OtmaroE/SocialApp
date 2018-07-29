@@ -1,5 +1,4 @@
 import { IsString, IsMongoId, IsNumber, IsDate, IsDateString, IsPositive } from 'class-validator';
-import { ApiModelProperty } from '@nestjs/swagger';
 
 export class CreatePurchaseDto {
     @IsString()

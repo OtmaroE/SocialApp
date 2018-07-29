@@ -6,6 +6,8 @@ import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { ProductsService } from '../products/products.service';
 import { PaymentService } from '../payment/payment.service';
 import { UserService } from '../users/users.service';
+import { PurchaseListDto } from './dto/list-purchase.dto';
+import { privateEncrypt } from 'crypto';
 
 @Injectable()
 export class PurchaseService {
@@ -16,20 +18,33 @@ export class PurchaseService {
         private readonly productsService: ProductsService,
     ) { }
 
-    async create({productId, userId, quantity = 1}: CreatePurchaseDto): Promise<Purchase> {
-        const findProduct = this.productsService.findOne(productId);
-        const getUserInfo = this.userService.findById(userId);
-        const getDebt = this.getUserTotalDebt(userId);
-        const getPaid = this.paymentService.getUserTotalPaid(userId);
-        const [product, userInfo, userTotalDebt, userTotalPaid] = await Promise.all([findProduct, getUserInfo, getDebt, getPaid]);
-        if (!product) throw new BadRequestException();
-        const userUsedCredit = userTotalDebt - userTotalPaid + (product.price * quantity);
-        if (userInfo.creditLimit <=  userUsedCredit) {
-            throw new ConflictException('Credit limit reached');
+    async create(productList: PurchaseListDto, id): Promise<Purchase | PurchaseListDto> {
+        let List = Array.from(productList);
+        if (List.length > 1) {
+            List = List.reduce((prev, curr) => {
+                const dupIndex = prev.findIndex((el) => curr.productId === el.productId);
+                if (dupIndex === -1) prev.push(curr);
+                else prev[dupIndex].quantity += curr.quantity;
+                return prev;
+            }, []);
         }
-        const newPurchase = new CreatePurchaseDto(userId, productId, quantity, product.name, quantity * product.price);
-        const createdPurchase = new this.PurchaseModel(newPurchase);
-        return await createdPurchase.save();
+        const bulkSave = [];
+        let total = 0;
+        const getUserInfo = this.userService.findById(id);
+        const getDebt = this.getUserTotalDebt(id);
+        const getPaid = this.paymentService.getUserTotalPaid(id);
+        const [userInfo, userTotalDebt, userTotalPaid] = await Promise.all([getUserInfo, getDebt, getPaid]);
+        for (const purchase of List) {
+            const product = await this.productsService.findOne(purchase.productId);
+            if (!product) throw new BadRequestException();
+            total += product.price;
+            bulkSave.push(new CreatePurchaseDto(id, product._id, purchase.quantity, product.name, purchase.quantity * product.price));
+        }
+        const userUsedCredit = userTotalDebt - userTotalPaid + (total);
+        if (userInfo.creditLimit <=  userUsedCredit) {
+            throw new ConflictException('Cant do this transaction');
+        }
+        return await this.PurchaseModel.insertMany(bulkSave);
     }
 
     async findAllDetails(userId: string): Promise<Purchase[]> {
