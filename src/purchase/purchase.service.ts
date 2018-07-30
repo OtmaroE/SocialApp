@@ -37,7 +37,7 @@ export class PurchaseService {
         for (const purchase of List) {
             const product = await this.productsService.findOne(purchase.productId);
             if (!product) throw new BadRequestException();
-            total += product.price;
+            total += (product.price * purchase.quantity);
             bulkSave.push(new CreatePurchaseDto(id, product._id, purchase.quantity, product.name, purchase.quantity * product.price));
         }
         const userUsedCredit = userTotalDebt - userTotalPaid + (total);

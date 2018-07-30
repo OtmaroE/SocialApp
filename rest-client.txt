@@ -1,0 +1,50 @@
+:token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNTg5ODA3NTE1YjA0MzEyNDE5MDk3ZiIsInVzZXJuYW1lIjoic3RyaW5nMSIsInJvbGVzIjpbXSwidXVpZCI6ImMwM2QyNmQwLTk0MTQtMTFlOC05MTBjLTM3NGZjOTYxYTYyYyIsImlhdCI6MTUzMjk2Nzc0OCwiZXhwIjoxNTMzMDEwOTQ4fQ.eLq0gKRZtmHwA1naUHlCxq3GckYMN5Fh4BDdcxxK95s
+
+# Login
+POST http://localhost:3000/api/users/login
+Content-Type: application/json
+
+{
+    "username":"string2",
+    "password":"1234"
+}
+
+# Purchase
+
+POST http://localhost:3000/api/purchases
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiI3NzBlOWFiMC05NDE1LTExZTgtOTEwYy0zNzRmYzk2MWE2MmMiLCJpYXQiOjE1MzI5NjgwNTQsImV4cCI6MTUzMzAxMTI1NH0.8IDxRLf2nXAEp3ZFq5H26W-DaZvJXiINrJDv3NRds00
+
+[{
+    "productId": "5b58f98a4446c013d4c67674",
+    "quantity": 20
+}]
+
+# Product list
+GET http://localhost:3000/api/products
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNTg5ODA3NTE1YjA0MzEyNDE5MDk3ZiIsInVzZXJuYW1lIjoic3RyaW5nMSIsInJvbGVzIjpbXSwidXVpZCI6ImMwM2QyNmQwLTk0MTQtMTFlOC05MTBjLTM3NGZjOTYxYTYyYyIsImlhdCI6MTUzMjk2Nzc0OCwiZXhwIjoxNTMzMDEwOTQ4fQ.eLq0gKRZtmHwA1naUHlCxq3GckYMN5Fh4BDdcxxK95s
+
+# Debt
+
+GET http://localhost:3000/api/purchases/debt
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiI3NzBlOWFiMC05NDE1LTExZTgtOTEwYy0zNzRmYzk2MWE2MmMiLCJpYXQiOjE1MzI5NjgwNTQsImV4cCI6MTUzMzAxMTI1NH0.8IDxRLf2nXAEp3ZFq5H26W-DaZvJXiINrJDv3NRds00
+
+# Change Debt 
+
+PATCH http://localhost:3000/api/users/5b5b9cdfad6adc06b8176714
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiI3NzBlOWFiMC05NDE1LTExZTgtOTEwYy0zNzRmYzk2MWE2MmMiLCJpYXQiOjE1MzI5NjgwNTQsImV4cCI6MTUzMzAxMTI1NH0.8IDxRLf2nXAEp3ZFq5H26W-DaZvJXiINrJDv3NRds00
+Content-Type: application/json
+
+{
+    "limit": 100
+}
+
+# Pay
+
+POST http://localhost:3000/api/payments
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiI3NzBlOWFiMC05NDE1LTExZTgtOTEwYy0zNzRmYzk2MWE2MmMiLCJpYXQiOjE1MzI5NjgwNTQsImV4cCI6MTUzMzAxMTI1NH0.8IDxRLf2nXAEp3ZFq5H26W-DaZvJXiINrJDv3NRds00
+
+{
+    "pay": 200
+}
