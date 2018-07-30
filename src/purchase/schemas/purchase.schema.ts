@@ -5,9 +5,10 @@ export const PurchaseSchema = new mongoose.Schema({
     productId: String,
     productName: String,
     pricePaid: Number,
-    created: { 
-        type: Date, 
-        default: Date.now 
+    quantity: Number,
+    created: {
+        type: Date,
+        default: Date.now,
     },
     modified: Date,
 });

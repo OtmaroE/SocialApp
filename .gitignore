@@ -12,6 +12,7 @@ restclient
 auto-save-list
 tramp
 .\#*
+rest-client.txt
 
 # Org-mode
 .org-id-locations

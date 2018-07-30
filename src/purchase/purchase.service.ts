@@ -1,24 +1,50 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Purchase } from './interfaces/purchase.interface';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { ProductsService } from '../products/products.service';
+import { PaymentService } from '../payment/payment.service';
+import { UserService } from '../users/users.service';
+import { PurchaseListDto } from './dto/list-purchase.dto';
+import { privateEncrypt } from 'crypto';
 
 @Injectable()
 export class PurchaseService {
     constructor(
         @InjectModel('Purchase') private readonly PurchaseModel: Model<Purchase>,
+        private readonly paymentService: PaymentService,
+        private readonly userService: UserService,
         private readonly productsService: ProductsService,
     ) { }
 
-    async create(createPurchaseDto: CreatePurchaseDto): Promise<Purchase> {
-        const productId = String(createPurchaseDto.productId);
-        const productInfo = await this.productsService.findOne(productId);
-        const userId = String(createPurchaseDto.userId);
-        const newPurchaseDto = new CreatePurchaseDto(userId, productId, productInfo.name, productInfo.price);
-        const createdPurchase = new this.PurchaseModel(newPurchaseDto);
-        return await createdPurchase.save();
+    async create(productList: PurchaseListDto, id): Promise<Purchase | PurchaseListDto> {
+        let List = Array.from(productList);
+        if (List.length > 1) {
+            List = List.reduce((prev, curr) => {
+                const dupIndex = prev.findIndex((el) => curr.productId === el.productId);
+                if (dupIndex === -1) prev.push(curr);
+                else prev[dupIndex].quantity += curr.quantity;
+                return prev;
+            }, []);
+        }
+        const bulkSave = [];
+        let total = 0;
+        const getUserInfo = this.userService.findById(id);
+        const getDebt = this.getUserTotalDebt(id);
+        const getPaid = this.paymentService.getUserTotalPaid(id);
+        const [userInfo, userTotalDebt, userTotalPaid] = await Promise.all([getUserInfo, getDebt, getPaid]);
+        for (const purchase of List) {
+            const product = await this.productsService.findOne(purchase.productId);
+            if (!product) throw new BadRequestException();
+            total += (product.price * purchase.quantity);
+            bulkSave.push(new CreatePurchaseDto(id, product._id, purchase.quantity, product.name, purchase.quantity * product.price));
+        }
+        const userUsedCredit = userTotalDebt - userTotalPaid + (total);
+        if (userInfo.creditLimit <=  userUsedCredit) {
+            throw new ConflictException('Cant do this transaction');
+        }
+        return await this.PurchaseModel.insertMany(bulkSave);
     }
 
     async findAllDetails(userId: string): Promise<Purchase[]> {
@@ -45,8 +71,8 @@ export class PurchaseService {
             .group({ _id: '$userId', totalOwed: { $sum: '$pricePaid' } })
             .exec();
         if (!totalOwedReport[0]) {
-            return 0
+            return 0;
         }
-        return totalOwedReport[0].totalOwed | 0;
+        return totalOwedReport[0].totalOwed || 0;
     }
 }

@@ -8,11 +8,11 @@ import { PurchaseModule } from 'purchase/purchase.module';
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: 'Payment', schema: PaymentSchema}]),
-        forwardRef(() => PurchaseModule)
+        forwardRef(() => PurchaseModule),
     ],
     controllers: [PaymentController],
     providers: [PaymentService],
-    exports: [PaymentService]
+    exports: [PaymentService],
 })
 
 export class PaymentModule { }
