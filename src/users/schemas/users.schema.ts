@@ -12,6 +12,7 @@ export const UserSchema = new mongoose.Schema({
     default: 10,
   },
   role: String,
+  slackId: String,
   created: {
     type: Date,
     default: Date.now,

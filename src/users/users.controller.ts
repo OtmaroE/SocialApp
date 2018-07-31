@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, UseGuards, Put, Patch, Param, Req } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, UseGuards, Put, Patch, Param, Req, Get } from '@nestjs/common';
 import { UsersDto } from './dto/users.dto';
 import { UserService } from './users.service';
 import { RoleGuard } from 'authentication/auth.guard';
@@ -50,5 +50,12 @@ export class UsersController {
     @ApiBearerAuth()
     updateCreditLimit(@Param('id', new ValidateMongoId()) user, @Body('limit', new ValidateLimit()) limit) {
         return this.userService.updateOneUserCreditLimit(user, limit);
+    }
+
+    @Get('/info/:slackID')
+    @ValidateToken()
+    @Roles('admin')
+    getUserInfo(@Param('slackId') slackId) {
+        return this.userService.findById(slackId);
     }
 }

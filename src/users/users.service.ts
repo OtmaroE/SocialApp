@@ -30,7 +30,7 @@ export class UserService {
         });
     }
     async findById(_id: string): Promise<UserInfo> {
-        return await this.userModel.findOne({ _id }).select('username creditLimit').exec();
+        return await this.userModel.findOne({$or: [{ _id }, { slackId: _id }]}).select('username creditLimit').exec();
     }
 
     signup(user: CreateUser): Promise<User> {
