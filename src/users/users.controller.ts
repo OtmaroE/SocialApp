@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, UseGuards, Put, Patch, Param, Req, Get } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, UseGuards, Put, Patch, Param, Req, Get, Query } from '@nestjs/common';
 import { UsersDto } from './dto/users.dto';
 import { UserService } from './users.service';
 import { RoleGuard } from 'authentication/auth.guard';
@@ -55,7 +55,14 @@ export class UsersController {
     @Get('/info/:slackID')
     @ValidateToken()
     @Roles('admin')
-    getUserInfo(@Param('slackId') slackId) {
+    getUserInfo(@Param('slackID') slackId) {
         return this.userService.findById(slackId);
+    }
+
+    @Get('/credit')
+    @ValidateToken()
+    @Roles('admin', 'user')
+    getCreditLimits(@Query('who') who) {
+        return this.userService.getCreditLimit(who);
     }
 }

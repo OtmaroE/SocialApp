@@ -9,16 +9,28 @@ Content-Type: application/json
     "password":"1234"
 }
 
+# Credit info 
+
+GET http://localhost:3000/api/users/credit?who=global
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiJmMzM0M2ZjMC05NGQ2LTExZTgtOWE2Ny0wZDc2ODJjMmM1MjQiLCJpYXQiOjE1MzMwNTExNTUsImV4cCI6MTUzMzA5NDM1NX0.QN2Ru3ID62YZ-jYfX5AJojd7YCScfsK9-_XBsLeUJXU
+
 # Purchase
 
 POST http://localhost:3000/api/purchases
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiI3NzBlOWFiMC05NDE1LTExZTgtOTEwYy0zNzRmYzk2MWE2MmMiLCJpYXQiOjE1MzI5NjgwNTQsImV4cCI6MTUzMzAxMTI1NH0.8IDxRLf2nXAEp3ZFq5H26W-DaZvJXiINrJDv3NRds00
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiIyZTcxNWVmMC05NTBmLTExZTgtYTZjNy0wMzkyYTM5ZjgwMmMiLCJpYXQiOjE1MzMwNzUzMDcsImV4cCI6MTUzMzExODUwN30.QqCOhKU3OEyTIa6ro9M5CNcDdYW9SgG0vacRYUluMgQ
 
 [{
     "productId": "5b58f98a4446c013d4c67674",
     "quantity": 20
 }]
+
+# Get purchases
+
+GET http://localhost:3000/api/purchases
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiJmMzM0M2ZjMC05NGQ2LTExZTgtOWE2Ny0wZDc2ODJjMmM1MjQiLCJpYXQiOjE1MzMwNTExNTUsImV4cCI6MTUzMzA5NDM1NX0.QN2Ru3ID62YZ-jYfX5AJojd7YCScfsK9-_XBsLeUJXU
+
 
 # Product list
 GET http://localhost:3000/api/products
@@ -43,7 +55,7 @@ Content-Type: application/json
 
 POST http://localhost:3000/api/payments
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiI3NzBlOWFiMC05NDE1LTExZTgtOTEwYy0zNzRmYzk2MWE2MmMiLCJpYXQiOjE1MzI5NjgwNTQsImV4cCI6MTUzMzAxMTI1NH0.8IDxRLf2nXAEp3ZFq5H26W-DaZvJXiINrJDv3NRds00
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiJmMzM0M2ZjMC05NGQ2LTExZTgtOWE2Ny0wZDc2ODJjMmM1MjQiLCJpYXQiOjE1MzMwNTExNTUsImV4cCI6MTUzMzA5NDM1NX0.QN2Ru3ID62YZ-jYfX5AJojd7YCScfsK9-_XBsLeUJXU
 
 {
     "pay": 200

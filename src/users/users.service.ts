@@ -10,6 +10,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { createJWT } from './helpers/jwt';
 import client from './helpers/redis';
 import { CreateUser } from './dto/create-user.dto';
+import { Validator } from 'class-validator';
+const validate = new Validator();
 
 @Injectable()
 export class UserService {
@@ -29,8 +31,21 @@ export class UserService {
             return { token: createJWT(userFound, parsedRoles) };
         });
     }
-    async findById(_id: string): Promise<UserInfo> {
-        return await this.userModel.findOne({$or: [{ _id }, { slackId: _id }]}).select('username creditLimit').exec();
+    async findById(userId: string): Promise<UserInfo> {
+        const query: any = {};
+        if (validate.isMongoId(userId)) query._id = userId;
+        else query.slackId = userId;
+        return await this.userModel.findOne(query).select('username creditLimit slackId').exec();
+    }
+
+    async getCreditLimit(who: string): Promise<object> {
+        const match: any = {};
+        (who !== 'global') ? match.slackId = who : {};
+        return await this.userModel
+            .aggregate()
+            .match(match)
+            .group({ _id: 0, creditAvg: { $avg: '$creditLimit' }})
+            .exec();
     }
 
     signup(user: CreateUser): Promise<User> {
