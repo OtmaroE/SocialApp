@@ -10,6 +10,7 @@ import { TokenGuard } from '../authentication/validtoken.guard';
 import { HashPasswordPipe } from 'pipes/hash-password.pipe';
 import { CreateUser } from './dto/create-user.dto';
 import { ApiUseTags, ApiResponse, ApiBearerAuth, ApiImplicitBody } from '@nestjs/swagger';
+import { SSL_OP_NO_COMPRESSION } from 'constants';
 
 @Controller('users')
 @UseGuards(RoleGuard, TokenGuard)
@@ -17,11 +18,14 @@ import { ApiUseTags, ApiResponse, ApiBearerAuth, ApiImplicitBody } from '@nestjs
 export class UsersController {
     constructor(private readonly userService: UserService) { }
     @Post('login')
-    @UsePipes(new ValidationPipe())
+    // @UsePipes(new ValidationPipe())
     @HttpCode(200)
     @ApiResponse({ status: 200, description: 'Login accepted and token generated.' })
-    login(@Body() usersDto: UsersDto) {
-        return this.userService.login(usersDto);
+    login(
+        @Query('auth_type') auth_type: string = 'password',
+        @Query('refresh_token') refresh_token: string = '',
+        @Body() usersDto: UsersDto) {
+        return this.userService.login(auth_type, refresh_token, usersDto);
     }
     @Post('logout')
     @ApiBearerAuth()

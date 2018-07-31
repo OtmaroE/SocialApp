@@ -12,6 +12,10 @@ export const createJWT = (user, parsedRoles: string[]) => {
     return token;
 };
 
+export const createRefreshToken = (id: string) => {
+    return jwt.sign({ id }, SECRET, { expiresIn: '24h' });
+};
+
 export const validateJWT = (token) => {
     let decoded = {};
     try {

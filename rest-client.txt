@@ -9,6 +9,10 @@ Content-Type: application/json
     "password":"1234"
 }
 
+# Refresh Token test
+POST http://localhost:3000/api/users/login?auth_type=refresh&refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsImlhdCI6MTUzMzA4MDcwMSwiZXhwIjoxNTMzMTY3MTAxfQ.4pySKA1RZwfQn_BtD0HEQkgPCUvRAs3A7OgLZXeJV-s
+
+
 # Credit info 
 
 GET http://localhost:3000/api/users/credit?who=global
@@ -29,7 +33,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRj
 
 GET http://localhost:3000/api/purchases
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiJmMzM0M2ZjMC05NGQ2LTExZTgtOWE2Ny0wZDc2ODJjMmM1MjQiLCJpYXQiOjE1MzMwNTExNTUsImV4cCI6MTUzMzA5NDM1NX0.QN2Ru3ID62YZ-jYfX5AJojd7YCScfsK9-_XBsLeUJXU
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNWI5Y2RmYWQ2YWRjMDZiODE3NjcxNCIsInVzZXJuYW1lIjoic3RyaW5nMiIsInJvbGVzIjpbImFkbWluIl0sInV1aWQiOiIyZTcxNWVmMC05NTBmLTExZTgtYTZjNy0wMzkyYTM5ZjgwMmMiLCJpYXQiOjE1MzMwNzUzMDcsImV4cCI6MTUzMzExODUwN30.QqCOhKU3OEyTIa6ro9M5CNcDdYW9SgG0vacRYUluMgQ
 
 
 # Product list

@@ -7,7 +7,7 @@ import { RoleMapping } from '../role-mappings/interfaces/role-mapping.interface'
 import { CreateRoleMappingDto } from '../role-mappings/dto/create-role-mapping.dto';
 import { UserInfo } from './interface/user-info.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { createJWT } from './helpers/jwt';
+import { createJWT, validateJWT, createRefreshToken } from './helpers/jwt';
 import client from './helpers/redis';
 import { CreateUser } from './dto/create-user.dto';
 import { Validator } from 'class-validator';
@@ -21,14 +21,26 @@ export class UserService {
         @InjectModel('RoleMapping') private readonly roleMappingModel: Model<RoleMapping>,
     ) { }
 
-    login(user: UsersDto): Promise<object> {
-        return this.userModel.findOne({ username: user.username }).exec().then(async (userFound) => {
-            if (!userFound || !userFound.comparePass(user.password)) throw new UnauthorizedException('Invalid credentials');
+    async login(auth_type: string, refresh_token: string, user: UsersDto): object | Promise<object> {
+        const query: any = {};
+        if (auth_type === 'refresh' && refresh_token !== '') {
+            const decoded: any = validateJWT(refresh_token);
+            query._id = decoded.id;
+        } else {
+            query.username = user.username;
+        }
+        console.log(query, auth_type);
+        return this.userModel.findOne(query).exec().then(async (userFound) => {
+            if (!userFound) throw new UnauthorizedException('Invalid credentials');
+            if (auth_type === 'password' && !userFound.comparePass(user.password)) throw new UnauthorizedException('Invalid credentials');
             const userRoles = await this.roleMappingModel.find({ userId: userFound._id }).populate('roleId', '-_id name').exec();
             const parsedRoles = userRoles.map(role => {
                 return role.roleId.name;
             });
-            return { token: createJWT(userFound, parsedRoles) };
+            return {
+                token: createJWT(userFound, parsedRoles),
+                refresh_token: createRefreshToken(userFound._id),
+            };
         });
     }
     async findById(userId: string): Promise<UserInfo> {
